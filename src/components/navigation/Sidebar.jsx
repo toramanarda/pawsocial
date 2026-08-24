@@ -6,7 +6,7 @@ import { Home, Search, Bell, User, Bookmark } from "lucide-react";
 
 export default function Sidebar({ onOpenCreateModal }) {
   const pathname = usePathname();
-  
+
   const navItems = [
     { label: "Home", href: "/", icon: Home },
     { label: "Discover", href: "/discovery", icon: Search },
@@ -29,14 +29,25 @@ export default function Sidebar({ onOpenCreateModal }) {
       <nav className="flex flex-col gap-1">
         {navItems.map((item) => {
           const Icon = item.icon;
+          const isActive = pathname === item.href;
           return (
             <Link
               key={item.label}
               href={item.href}
-              className="flex items-center gap-[10px] px-[11px] py-[10px] rounded-[10px] text-[14px] font-[650] text-muted hover:bg-surface/60 hover:text-ink transition-colors"
+              className={`flex items-center justify-between px-[11px] py-[10px] rounded-[10px] text-[14px] font-[650] transition-colors ${isActive
+                  ? "text-ink bg-surface font-bold"
+                  : "text-muted hover:bg-surface/60 hover:text-ink"
+                }`}
             >
-              <Icon size={19} className="shrink-0" />
-              <span>{item.label}</span>
+              <div className="flex items-center gap-[10px]">
+                <Icon size={19} className="shrink-0" />
+                <span>{item.label}</span>
+              </div>
+              {item.badge > 0 && (
+                <span className="grid place-items-center w-5 h-5 rounded-full bg-coral text-white text-[11px] font-bold">
+                  {item.badge}
+                </span>
+              )}
             </Link>
           );
         })}
