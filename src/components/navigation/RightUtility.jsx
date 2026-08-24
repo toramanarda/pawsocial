@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
+import Avatar from "@/components/ui/Avatar";
 
 export default function RightUtility() {
   const [searchVal, setSearchVal] = useState("");
@@ -16,6 +17,11 @@ export default function RightUtility() {
       { id: "t4", tag: "#dogfriendly", postCount: "2,032 posts" },
     ];
   };
+  const suggestedUsers = [
+    { id: "u-elif", name: "Elif Fidan", handle: "@eliffidan", avatar: "EF", avatarColor: "peach" },
+    { id: "u-mnuri", name: "Mehmet Nuri", handle: "@mnuri", avatar: "MN", avatarColor: "violet" },
+    { id: "u-ayse", name: "Ayşe Kaya", handle: "@aysekaya", avatar: "AK", avatarColor: "violet" },
+  ];
 
   return (
     <aside className="hidden lg:block w-[300px] xl:w-[340px] p-[18px_16px] bg-[#fcfdfd] border-l border-line shrink-0 sticky top-0 h-screen overflow-y-auto">
@@ -50,6 +56,28 @@ export default function RightUtility() {
               </span>
               <span className="text-[11px] text-muted">{t.postCount}</span>
             </Link>
+          ))}
+        </div>
+      </div>
+      {/* Who to follow */}
+      <div className="mt-4 p-[14px_16px] rounded-[14px] bg-surface border border-line/60">
+        <h3 className="font-extrabold text-[14px] text-ink mb-3">Who to follow</h3>
+        <div className="flex flex-col gap-3">
+          {suggestedUsers.map((user) => (
+            <div key={user.id} className="flex items-center justify-between gap-2">
+              <Link href={`/profile/${user.id}`} className="flex items-center gap-2 min-w-0 group">
+                <Avatar initials={user.avatar} color={user.avatarColor} size="sm" />
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[12px] font-bold text-ink truncate group-hover:underline">
+                    {user.name}
+                  </span>
+                  <span className="text-[11px] text-muted truncate">{user.handle}</span>
+                </div>
+              </Link>
+              <button className="px-3 py-1 rounded-full bg-ink text-white text-[11px] font-bold hover:bg-ink/85 transition-colors shrink-0 cursor-pointer">
+                Follow
+              </button>
+            </div>
           ))}
         </div>
       </div>
