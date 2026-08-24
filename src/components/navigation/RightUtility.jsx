@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Search } from "lucide-react";
 
 export default function RightUtility() {
@@ -8,6 +9,12 @@ export default function RightUtility() {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+    const trends = [
+      { id: "t1", category: "Trending in Istanbul", tag: "#dogs", postCount: "4,218 posts" },
+      { id: "t2", category: "Outdoor", tag: "#morningwalk", postCount: "1,020 posts" },
+      { id: "t3", category: "Pets", tag: "#adoptdontshop", postCount: "860 posts" },
+      { id: "t4", tag: "#dogfriendly", postCount: "2,032 posts" },
+    ];
   };
 
   return (
@@ -25,6 +32,27 @@ export default function RightUtility() {
           />
         </div>
       </form>
+      {/* Trending */}
+      <div className="mt-4 p-[14px_16px] rounded-[14px] bg-surface border border-line/60">
+        <h3 className="font-extrabold text-[14px] text-ink mb-3">Trends for you</h3>
+        <div className="flex flex-col gap-3">
+          {trends.map((t) => (
+            <Link
+              key={t.id}
+              href={`/discovery?q=${encodeURIComponent(t.tag)}`}
+              className="flex flex-col group"
+            >
+              {t.category && (
+                <span className="text-[11px] text-muted font-medium">{t.category}</span>
+              )}
+              <span className="text-[13px] font-bold text-ink group-hover:text-coral transition-colors">
+                {t.tag}
+              </span>
+              <span className="text-[11px] text-muted">{t.postCount}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
     </aside>
   );
 }
