@@ -8,6 +8,7 @@ import Badge from "@/components/ui/Badge";
 import { useApp } from "@/context/AppContext";
 
 export default function PostCard({ post }) {
+  const { toggleLike, toggleBookmark, toggleRepost } = useApp();
   if (!post) return null;
 
   const authorId = post.authorId || post.author?.id || "u-arda";
