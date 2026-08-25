@@ -2,9 +2,56 @@
 
 import { useState } from "react";
 import { Search, SquarePen } from "lucide-react";
+import Avatar from "@/components/ui/Avatar";
 
 export default function MessagesPage() {
   const [searchVal, setSearchVal] = useState("");
+  const [selectedChatId, setSelectedChatId] = useState("c1");
+
+  const conversations = [
+    {
+      id: "c1",
+      user: {
+        name: "Elif Fidan",
+        handle: "@eliffidan",
+        avatar: "EF",
+        avatarColor: "peach",
+      },
+      lastMessage: "Harika! Hafta sonu Maçka Parkı'nda buluşalım o zaman 🐾",
+      time: "15m",
+      unread: 1,
+    },
+    {
+      id: "c2",
+      user: {
+        name: "Mehmet Nuri",
+        handle: "@mnuri",
+        avatar: "MN",
+        avatarColor: "violet",
+      },
+      lastMessage: "Eğitim ödül mamasının linkini gönderdim, bakabildin mi?",
+      time: "2h",
+      unread: 0,
+    },
+    {
+      id: "c3",
+      user: {
+        name: "Ayşe Kaya",
+        handle: "@aysekaya",
+        avatar: "AK",
+        avatarColor: "violet",
+      },
+      lastMessage: "Veteriner kliniği önerin için çok teşekkürler!",
+      time: "1d",
+      unread: 0,
+    },
+  ];
+
+  const filteredConversations = conversations.filter(
+    (c) =>
+      c.user.name.toLowerCase().includes(searchVal.toLowerCase()) ||
+      c.user.handle.toLowerCase().includes(searchVal.toLowerCase())
+  );
 
   return (
     <div className="h-[calc(100vh-60px)] md:h-screen flex flex-col md:flex-row overflow-hidden bg-white">
@@ -33,6 +80,41 @@ export default function MessagesPage() {
               className="bg-transparent border-0 outline-none w-full text-ink placeholder:text-muted"
             />
           </div>
+        </div>
+        {/* Sohbet Listesi Akışı */}
+        <div className="flex-1 overflow-y-auto divide-y divide-line/60">
+          {filteredConversations.map((chat) => (
+            <button
+              key={chat.id}
+              onClick={() => setSelectedChatId(chat.id)}
+              className={`w-full p-3 flex items-start gap-3 text-left transition-colors cursor-pointer ${selectedChatId === chat.id
+                  ? "bg-surface"
+                  : "hover:bg-surface/50 bg-white"
+                }`}
+            >
+              <Avatar
+                initials={chat.user.avatar}
+                color={chat.user.avatarColor}
+                size="md"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-1 mb-0.5">
+                  <span className="font-bold text-[13px] text-ink truncate">
+                    {chat.user.name}
+                  </span>
+                  <span className="text-[11px] text-muted shrink-0">
+                    {chat.time}
+                  </span>
+                </div>
+                <p className="text-[12px] text-muted truncate leading-snug">
+                  {chat.lastMessage}
+                </p>
+              </div>
+              {chat.unread > 0 && (
+                <span className="w-2 h-2 rounded-full bg-coral shrink-0 mt-2" />
+              )}
+            </button>
+          ))}
         </div>
       </div>
     </div>
