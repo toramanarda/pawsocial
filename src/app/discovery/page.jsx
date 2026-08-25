@@ -1,12 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search, MapPin, Sparkles, TrendingUp } from "lucide-react";
 import Badge from "@/components/ui/Badge";
+import PostCard from "@/components/feed/PostCard";
+import { useApp } from "@/context/AppContext";
 
-export default function DiscoveryPage() {
-  const [searchTerm, setSearchTerm] = useState("");
+function DiscoveryContent() {
+  const searchParams = useSearchParams();
+  const queryParam = searchParams.get("q") || "";
+  const { posts } = useApp();
+
+  const [searchTerm, setSearchTerm] = useState(queryParam);
   const [activeCategory, setActiveCategory] = useState("All");
+
+  useEffect(() => {
+    if (queryParam) {
+      setSearchTerm(queryParam);
+    }
+  }, [queryParam]);
 
   const categories = ["All", "Parks", "Walks", "Dog Care", "Events", "Adoption"];
 
@@ -58,6 +71,15 @@ export default function DiscoveryPage() {
       item.tags.some((t) => t.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
+  const matchedPosts = searchTerm.trim()
+    ? posts.filter((p) => {
+      const cleanSearch = searchTerm.toLowerCase().replace("#", "");
+      const matchContent = p.content?.toLowerCase().includes(cleanSearch);
+      const matchTags = p.tags?.some((t) => t.toLowerCase().includes(cleanSearch));
+      const matchCategory = p.category?.toLowerCase().includes(cleanSearch);
+      return matchContent || matchTags || matchCategory;
+    })
+    : [];
 
   return (
     <div>
@@ -81,8 +103,8 @@ export default function DiscoveryPage() {
               key={cat}
               onClick={() => setActiveCategory(cat)}
               className={`text-[12px] font-bold px-3.5 py-1.5 rounded-full whitespace-nowrap transition-colors cursor-pointer ${activeCategory === cat
-                  ? "bg-coral text-white shadow-button"
-                  : "bg-surface text-muted hover:text-ink hover:bg-line/50"
+                ? "bg-coral text-white shadow-button"
+                : "bg-surface text-muted hover:text-ink hover:bg-line/50"
                 }`}
             >
               {cat}
@@ -90,6 +112,19 @@ export default function DiscoveryPage() {
           ))}
         </div>
       </header>
+      {/* Arama İle İlgili Gönderiler */}
+      {searchTerm.trim() && matchedPosts.length > 0 && (
+        <div className="border-b border-line">
+          <div className="px-4 pt-3 pb-1 text-[13px] font-extrabold text-muted">
+            RELATED POSTS ({matchedPosts.length})
+          </div>
+          <div className="divide-y divide-line">
+            {matchedPosts.map((post) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+        </div>
+      )}
       {/* Keşfet Kartları Listesi */}
       <div className="p-4 flex flex-col gap-3">
         {filteredItems.length === 0 ? (
@@ -139,5 +174,12 @@ export default function DiscoveryPage() {
         )}
       </div>
     </div>
+  );
+}
+export default function DiscoveryPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-muted text-sm">Loading discovery...</div>}>
+      <DiscoveryContent />
+    </Suspense>
   );
 }
