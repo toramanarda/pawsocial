@@ -71,6 +71,37 @@ export default function PostCard({ post }) {
           />
         </div>
       )}
+      {/* Etkileşim Butonları */}
+      <div className="flex items-center justify-between text-muted text-[13px] pt-1 max-w-[420px]">
+        {/* Yorum Butonu */}
+        <button className="flex items-center gap-1.5 hover:text-coral transition-colors cursor-pointer group">
+          <span className="p-1.5 rounded-full group-hover:bg-coral/10 transition-colors">
+            <MessageCircle size={16} />
+          </span>
+          <span>{post.commentsCount ?? 0}</span>
+        </button>
+
+        {/* Repost Butonu */}
+        <button className="flex items-center gap-1.5 hover:text-green-600 transition-colors cursor-pointer group">
+          <span className="p-1.5 rounded-full group-hover:bg-green-500/10 transition-colors">
+            <Repeat2 size={17} />
+          </span>
+          <span>{post.repostsCount ?? 0}</span>
+        </button>
+
+        {/* Beğeni Butonu */}
+        <button className="flex items-center gap-1.5 hover:text-coral transition-colors cursor-pointer group">
+          <span className="p-1.5 rounded-full group-hover:bg-coral/10 transition-colors">
+            <Heart size={16} />
+          </span>
+          <span>{post.likesCount ?? 0}</span>
+        </button>
+
+        {/* Kaydet Butonu */}
+        <button className="p-1.5 rounded-full hover:bg-surface hover:text-ink transition-colors cursor-pointer">
+          <Bookmark size={16} />
+        </button>
+      </div>
     </article>
   );
 }
