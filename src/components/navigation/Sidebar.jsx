@@ -15,7 +15,8 @@ export default function Sidebar() {
     { label: "Discover", href: "/discovery", icon: Search },
     { label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
     { label: "Notifications", href: "/notifications", icon: Bell, badge: 2 },
-    { label: "Profile", href: "/profile", icon: User },
+    { label: "Profile", href: "/profile/u-arda", icon: User },
+    { label: "Messages", href: "/messages", icon: Mail },
   ];
 
   return (
@@ -32,14 +33,17 @@ export default function Sidebar() {
       <nav className="flex flex-col gap-1">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          const isActive =
+            item.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(item.href);
           return (
             <Link
               key={item.label}
               href={item.href}
               className={`flex items-center justify-between px-[11px] py-[10px] rounded-[10px] text-[14px] font-[650] transition-colors ${isActive
-                  ? "text-ink bg-surface font-bold"
-                  : "text-muted hover:bg-surface/60 hover:text-ink"
+                ? "text-ink bg-surface font-bold"
+                : "text-muted hover:bg-surface/60 hover:text-ink"
                 }`}
             >
               <div className="flex items-center gap-[10px]">
