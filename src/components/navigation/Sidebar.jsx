@@ -16,7 +16,6 @@ export default function Sidebar() {
     { label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
     { label: "Notifications", href: "/notifications", icon: Bell, badge: 2 },
     { label: "Profile", href: "/profile/u-arda", icon: User },
-    { label: "Messages", href: "/messages", icon: Mail },
   ];
 
   return (
