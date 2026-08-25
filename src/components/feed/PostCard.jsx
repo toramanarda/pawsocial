@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Avatar from "@/components/ui/Avatar";
 import Image from "next/image";
+import { Heart, MessageCircle, Repeat2, Bookmark } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 
 export default function PostCard({ post }) {
