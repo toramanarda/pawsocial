@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { initialPosts, initialUsers, initialTrends } from "@/data/mockData";
 
 const AppContext = createContext();
@@ -9,8 +9,32 @@ export function AppProvider({ children }) {
   const [posts, setPosts] = useState(initialPosts);
   const [users, setUsers] = useState(initialUsers);
   const [activeCategory, setActiveCategory] = useState("all");
-  const [feedTab, setFeedTab] = useState("for-you"); 
+  const [feedTab, setFeedTab] = useState("for-you");
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const savedPosts = localStorage.getItem("doggo_posts");
+      const savedUsers = localStorage.getItem("doggo_users");
+      if (savedPosts) setPosts(JSON.parse(savedPosts));
+      if (savedUsers) setUsers(JSON.parse(savedUsers));
+    } catch (e) {
+      console.error("LocalStorage load error:", e);
+    } finally {
+      setIsLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    try {
+      localStorage.setItem("doggo_posts", JSON.stringify(posts));
+      localStorage.setItem("doggo_users", JSON.stringify(users));
+    } catch (e) {
+      console.error("LocalStorage save error:", e);
+    }
+  }, [posts, users, isLoaded]);
 
   // Post Beğenme
   const toggleLike = (postId) => {
@@ -78,7 +102,7 @@ export function AppProvider({ children }) {
       isBookmarked: false,
       isReposted: false,
     };
-    setPosts([newPost, ...posts]);
+    setPosts((prev) => [newPost, ...prev]);
   };
 
   // Kullanıcı Takip Et / Bırak
