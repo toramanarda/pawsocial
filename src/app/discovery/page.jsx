@@ -1,13 +1,63 @@
 "use client";
 
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, MapPin, Sparkles, TrendingUp } from "lucide-react";
+import Badge from "@/components/ui/Badge";
 
 export default function DiscoveryPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
 
   const categories = ["All", "Parks", "Walks", "Dog Care", "Events", "Adoption"];
+
+  const discoveryItems = [
+    {
+      id: "d1",
+      title: "Maçka Demokrasi Parkı Köpek Alanı",
+      category: "Parks",
+      location: "Şişli, İstanbul",
+      tags: ["#mackaparki", "#dogpark"],
+      stats: "1.2k check-ins this week",
+      rating: "4.9 ★",
+    },
+    {
+      id: "d2",
+      title: "Caddebostan Sahil Yürüyüş Parkuru",
+      category: "Walks",
+      location: "Kadıköy, İstanbul",
+      tags: ["#caddebostan", "#morningwalk"],
+      stats: "840 walkers today",
+      rating: "4.8 ★",
+    },
+    {
+      id: "d3",
+      title: "Bebek Parkı Sosyalleşme Alanı",
+      category: "Parks",
+      location: "Beşiktaş, İstanbul",
+      tags: ["#bebekparki", "#socialdogs"],
+      stats: "520 posts",
+      rating: "4.7 ★",
+    },
+    {
+      id: "d4",
+      title: "Yaz Aylarında Pati Bakımı & Sıcak Asfalt Uyarısı",
+      category: "Dog Care",
+      location: "General Guide",
+      tags: ["#pawcare", "#summercare"],
+      stats: "2.4k readers",
+      rating: "Tips",
+    },
+  ];
+
+  const filteredItems = discoveryItems.filter((item) => {
+    const matchesCategory =
+      activeCategory === "All" || item.category === activeCategory;
+    const matchesSearch =
+      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.tags.some((t) => t.toLowerCase().includes(searchTerm.toLowerCase()));
+    return matchesCategory && matchesSearch;
+  });
 
   return (
     <div>
@@ -30,17 +80,64 @@ export default function DiscoveryPage() {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`text-[12px] font-bold px-3.5 py-1.5 rounded-full whitespace-nowrap transition-colors cursor-pointer ${
-                activeCategory === cat
+              className={`text-[12px] font-bold px-3.5 py-1.5 rounded-full whitespace-nowrap transition-colors cursor-pointer ${activeCategory === cat
                   ? "bg-coral text-white shadow-button"
                   : "bg-surface text-muted hover:text-ink hover:bg-line/50"
-              }`}
+                }`}
             >
               {cat}
             </button>
           ))}
         </div>
       </header>
+      {/* Keşfet Kartları Listesi */}
+      <div className="p-4 flex flex-col gap-3">
+        {filteredItems.length === 0 ? (
+          <div className="py-12 text-center text-muted text-[14px]">
+            No results found for &ldquo;{searchTerm}&rdquo;
+          </div>
+        ) : (
+          filteredItems.map((item) => (
+            <div
+              key={item.id}
+              className="p-4 rounded-[14px] bg-surface/60 border border-line hover:border-line/90 hover:bg-surface transition-all cursor-pointer group"
+            >
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <div className="flex items-center gap-2">
+                  <Badge variant="category">{item.category}</Badge>
+                  <span className="text-[12px] font-semibold text-coral flex items-center gap-1">
+                    <Sparkles size={13} />
+                    {item.rating}
+                  </span>
+                </div>
+                <span className="text-[11px] text-muted font-medium flex items-center gap-1">
+                  <TrendingUp size={12} />
+                  {item.stats}
+                </span>
+              </div>
+
+              <h3 className="text-[15px] font-bold text-ink group-hover:text-coral transition-colors mb-1">
+                {item.title}
+              </h3>
+
+              <div className="flex items-center justify-between text-[12px] text-muted mt-2">
+                <span className="flex items-center gap-1">
+                  <MapPin size={13} className="text-muted" />
+                  {item.location}
+                </span>
+
+                <div className="flex items-center gap-1.5">
+                  {item.tags.map((tag, idx) => (
+                    <span key={idx} className="font-semibold text-ink/70">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
