@@ -52,6 +52,39 @@ export function AppProvider({ children }) {
       })
     );
   };
+  const addComment = (postId, commentText, parentCommentId = null) => {
+    if (!commentText.trim()) return;
+
+    const newComment = {
+      id: `c-${Date.now()}`,
+      parentId: parentCommentId,
+      author: {
+        id: currentUser?.id || "u-arda",
+        name: currentUser?.name || "Arda Toraman",
+        handle: currentUser?.handle || "@ardatoraman",
+        avatar: currentUser?.avatar || "AT",
+        avatarColor: currentUser?.avatarColor || "coral",
+      },
+      content: commentText.trim(),
+      createdAt: "Just now",
+      likesCount: 0,
+      isLiked: false,
+    };
+
+    setPosts((prevPosts) =>
+      prevPosts.map((post) => {
+        if (post.id === postId) {
+          const currentComments = post.commentsList || [];
+          return {
+            ...post,
+            commentsCount: (post.commentsCount || 0) + 1,
+            commentsList: [newComment, ...currentComments],
+          };
+        }
+        return post;
+      })
+    );
+  };
 
   // Post Kaydetme 
   const toggleBookmark = (postId) => {
@@ -130,6 +163,7 @@ export function AppProvider({ children }) {
         toggleRepost,
         addPost,
         toggleFollow,
+        addComment,
       }}
     >
       {children}
