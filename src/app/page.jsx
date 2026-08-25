@@ -1,52 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useApp } from "@/context/AppContext";
 import CreatePostBox from "@/components/feed/CreatePostBox";
 import PostCard from "@/components/feed/PostCard";
 
 export default function HomePage() {
-  const [activeTab, setActiveTab] = useState("forYou");
 
-  const [posts, setPosts] = useState([
-    {
-      id: "p1",
-      authorId: "u-elif",
-      author: {
-        name: "Elif Fidan",
-        handle: "@eliffidan",
-        avatar: "EF",
-        avatarColor: "peach",
-      },
-      content: "Sabah Maçka Parkı yürüyüşünde harika dostlarla karşılaştık! 🐾 Havalar ısınırken sabah serinliğini kaçırmayın.",
-      category: "Walks",
-      tags: ["mackaparki", "morningwalk", "dogs"],
-      createdAt: "2h ago",
-      likesCount: 24,
-      commentsCount: 5,
-      repostsCount: 2,
-    },
-    {
-      id: "p2",
-      authorId: "u-mnuri",
-      author: {
-        name: "Mehmet Nuri",
-        handle: "@mnuri",
-        avatar: "MN",
-        avatarColor: "violet",
-      },
-      content: "Yavru köpeklerde temel itaat eğitimi için ilk 3 ay çok kritik. Sabır ve bolca ödül maması işin sırrı!",
-      category: "Tips & Tricks",
-      tags: ["dogtraining", "puppylife"],
-      createdAt: "4h ago",
-      likesCount: 42,
-      commentsCount: 11,
-      repostsCount: 6,
-    },
-  ]);
+  const { posts, users, feedTab, setFeedTab, activeCategory, setActiveCategory } = useApp();
 
-  const handleNewPost = (newPost) => {
-    setPosts((prev) => [newPost, ...prev]);
-  };
+  // Takip edilen kullanıcıların ID listesi
+  const followingUserIds = users.filter((u) => u.isFollowing).map((u) => u.id);
+
+  // For You / Following ve Kategori Filtresi
+  const filteredPosts = posts.filter((post) => {
+    // Tab Filtresi
+    if (feedTab === "following") {
+      const authorId = post.authorId || post.author?.id;
+      if (!followingUserIds.includes(authorId)) return false;
+    }
+    // Kategori Filtresi
+    if (activeCategory && activeCategory !== "all") {
+      if (post.category?.toLowerCase() !== activeCategory.toLowerCase()) return false;
+    }
+    return true;
+  });
+
+  const categories = [
+    { id: "all", label: "All" },
+    { id: "general", label: "General" },
+    { id: "parks", label: "Parks" },
+    { id: "walks", label: "Walks" },
+    { id: "dog care", label: "Dog Care" },
+    { id: "tips & tricks", label: "Tips & Tricks" },
+    { id: "adoption", label: "Adoption" },
+  ];
 
   return (
     <div>
@@ -54,39 +41,62 @@ export default function HomePage() {
       <header className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-line z-10">
         <div className="flex border-b border-line">
           <button
-            onClick={() => setActiveTab("forYou")}
+            onClick={() => setFeedTab("for-you")}
             className="flex-1 py-3 text-center font-bold text-[14px] relative transition-colors cursor-pointer"
           >
-            <span className={activeTab === "forYou" ? "text-ink" : "text-muted"}>
+            <span className={feedTab === "for-you" ? "text-ink" : "text-muted"}>
               For you
             </span>
-            {activeTab === "forYou" && (
+            {feedTab === "for-you" && (
               <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-coral rounded-full" />
             )}
           </button>
 
           <button
-            onClick={() => setActiveTab("following")}
+            onClick={() => setFeedTab("following")}
             className="flex-1 py-3 text-center font-bold text-[14px] relative transition-colors cursor-pointer"
           >
-            <span className={activeTab === "following" ? "text-ink" : "text-muted"}>
+            <span className={feedTab === "following" ? "text-ink" : "text-muted"}>
               Following
             </span>
-            {activeTab === "following" && (
+            {feedTab === "following" && (
               <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-coral rounded-full" />
             )}
           </button>
         </div>
+        {/* Kategori Filtreleme */}
+        <div className="flex items-center gap-2 px-4 py-2.5 overflow-x-auto no-scrollbar bg-white">
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`px-3 py-1 rounded-full text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer ${activeCategory === cat.id
+                ? "bg-coral text-white font-semibold"
+                : "bg-surface text-muted hover:text-ink hover:bg-line/60"
+                }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
       </header>
 
       {/* Post Oluşturma */}
-      <CreatePostBox onPostCreated={handleNewPost} />
+      <CreatePostBox />
 
       {/* Gönderi Akışı Listesi */}
       <div className="divide-y divide-line">
-        {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
+        {filteredPosts.length > 0 ? (
+          filteredPosts.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))
+        ) : (
+          <div className="p-8 text-center text-muted text-[14px]">
+            {feedTab === "following"
+              ? "Henüz takip ettiğin kişilerden bu kategoride gönderi yok."
+              : "Bu kategoride henüz gönderi bulunamadı."}
+          </div>
+        )}
       </div>
     </div>
   );
