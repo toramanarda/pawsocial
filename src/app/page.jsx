@@ -2,9 +2,51 @@
 
 import { useState } from "react";
 import CreatePostBox from "@/components/feed/CreatePostBox";
+import PostCard from "@/components/feed/PostCard";
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState("forYou");
+
+  const [posts, setPosts] = useState([
+    {
+      id: "p1",
+      authorId: "u-elif",
+      author: {
+        name: "Elif Fidan",
+        handle: "@eliffidan",
+        avatar: "EF",
+        avatarColor: "peach",
+      },
+      content: "Sabah Maçka Parkı yürüyüşünde harika dostlarla karşılaştık! 🐾 Havalar ısınırken sabah serinliğini kaçırmayın.",
+      category: "Walks",
+      tags: ["mackaparki", "morningwalk", "dogs"],
+      createdAt: "2h ago",
+      likesCount: 24,
+      commentsCount: 5,
+      repostsCount: 2,
+    },
+    {
+      id: "p2",
+      authorId: "u-mnuri",
+      author: {
+        name: "Mehmet Nuri",
+        handle: "@mnuri",
+        avatar: "MN",
+        avatarColor: "violet",
+      },
+      content: "Yavru köpeklerde temel itaat eğitimi için ilk 3 ay çok kritik. Sabır ve bolca ödül maması işin sırrı!",
+      category: "Tips & Tricks",
+      tags: ["dogtraining", "puppylife"],
+      createdAt: "4h ago",
+      likesCount: 42,
+      commentsCount: 11,
+      repostsCount: 6,
+    },
+  ]);
+
+  const handleNewPost = (newPost) => {
+    setPosts((prev) => [newPost, ...prev]);
+  };
 
   return (
     <div>
@@ -38,7 +80,14 @@ export default function HomePage() {
       </header>
 
       {/* Post Oluşturma */}
-      <CreatePostBox />
+      <CreatePostBox onPostCreated={handleNewPost} />
+
+      {/* Gönderi Akışı Listesi */}
+      <div className="divide-y divide-line">
+        {posts.map((post) => (
+          <PostCard key={post.id} post={post} />
+        ))}
+      </div>
     </div>
   );
 }
