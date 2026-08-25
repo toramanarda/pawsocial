@@ -6,22 +6,47 @@ import { ArrowLeft, Calendar, MapPin } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import PostCard from "@/components/feed/PostCard";
+import { useApp } from "@/context/AppContext";
 
 export default function ProfilePage({ params }) {
   const unwrappedParams = use(params);
   const router = useRouter();
-  const user = {
-    id: unwrappedParams.id || "u-arda",
-    name: "Arda Toraman",
-    handle: `@${unwrappedParams.id || "ardatoraman"}`,
-    avatar: "AT",
-    avatarColor: "coral",
-    bio: "Golden Retriever & Samoyed dad 🐕 Full-stack software developer exploring pet tech & local dog parks in Istanbul 🐾",
-    location: "Istanbul, Turkey",
-    joinedDate: "Joined March 2024",
-    followingCount: 142,
-    followersCount: 890,
-  };
+  const { posts, users, currentUser, toggleFollow } = useApp();
+
+  const profileId = unwrappedParams.id || "u-arda";
+  const isOwnProfile = profileId === (currentUser?.id || "u-arda") || profileId === (currentUser?.handle?.replace("@", "") || "ardatoraman");
+
+  // Kullanıcıyı bul veya varsayılan olarak currentUser'ı al
+  const matchedUser = users.find(
+    (u) => u.id === profileId || u.handle === `@${profileId}` || u.handle === profileId
+  );
+
+  const user = isOwnProfile
+    ? {
+      id: "u-arda",
+      name: currentUser?.name || "Arda Toraman",
+      handle: currentUser?.handle || "@ardatoraman",
+      avatar: currentUser?.avatar || "AT",
+      avatarColor: currentUser?.avatarColor || "coral",
+      bio: "Golden Retriever & Samoyed dad 🐕 Full-stack software developer exploring pet tech & local dog parks in Istanbul 🐾",
+      location: "Istanbul, Turkey",
+      joinedDate: "Joined March 2024",
+      followingCount: users.filter((u) => u.isFollowing).length,
+      followersCount: 890,
+    }
+    : {
+      id: matchedUser?.id || profileId,
+      name: matchedUser?.name || profileId,
+      handle: matchedUser?.handle || `@${profileId}`,
+      avatar: matchedUser?.avatar || profileId.slice(0, 2).toUpperCase(),
+      avatarColor: matchedUser?.avatarColor || "blue",
+      bio: matchedUser?.bio || "Pati sever Doggo kullanıcısı 🐾",
+      location: matchedUser?.location || "Istanbul, Turkey",
+      joinedDate: "Joined 2024",
+      followingCount: 45,
+      followersCount: matchedUser?.isFollowing ? 121 : 120,
+      isFollowing: matchedUser?.isFollowing || false,
+    };
   const [activeProfileTab, setActiveProfileTab] = useState("posts");
 
   const profileTabs = [
@@ -30,42 +55,13 @@ export default function ProfilePage({ params }) {
     { id: "likes", label: "Likes" },
   ];
 
-  const userPosts = [
-    {
-      id: "up-1",
-      authorId: user.id,
-      author: {
-        name: user.name,
-        handle: user.handle,
-        avatar: user.avatar,
-        avatarColor: user.avatarColor,
-      },
-      content: "Caddebostan sahilinde hafta sonu köpek buluşması organize ediyoruz. Katılmak isteyenler yoruma pati bıraksın! 🐾🐕",
-      category: "Events",
-      tags: ["caddebostan", "dogmeetup", "istanbul"],
-      createdAt: "1d ago",
-      likesCount: 56,
-      commentsCount: 14,
-      repostsCount: 8,
-    },
-    {
-      id: "up-2",
-      authorId: user.id,
-      author: {
-        name: user.name,
-        handle: user.handle,
-        avatar: user.avatar,
-        avatarColor: user.avatarColor,
-      },
-      content: "Köpeklerde tüy dökülme döneminde beslenmeye omega-3 takviyesi eklemek inanılmaz fark yaratıyor.",
-      category: "Dog Care",
-      tags: ["dogcare", "nutrition"],
-      createdAt: "3d ago",
-      likesCount: 38,
-      commentsCount: 6,
-      repostsCount: 4,
-    },
-  ];
+  const userPosts = posts.filter((p) => {
+    const isAuthor = p.author?.id === user.id || p.authorId === user.id;
+    if (activeProfileTab === "posts") return isAuthor;
+    if (activeProfileTab === "media") return isAuthor && p.image;
+    if (activeProfileTab === "likes") return p.isLiked;
+    return false;
+  });
 
   return (
     <div>
@@ -81,7 +77,7 @@ export default function ProfilePage({ params }) {
           <h1 className="font-extrabold text-[16px] text-ink leading-tight">
             Profile
           </h1>
-          <span className="text-[12px] text-muted">@{unwrappedParams.id}</span>
+          <span className="text-[12px] text-muted">{user.handle}</span>
         </div>
       </header>
       {/* Kapak / Banner */}
@@ -94,9 +90,21 @@ export default function ProfilePage({ params }) {
           <div className="ring-4 ring-white rounded-full bg-white">
             <Avatar initials={user.avatar} color={user.avatarColor} size="lg" />
           </div>
-          <Button variant="secondary" size="sm">
-            Edit Profile
-          </Button>
+          {isOwnProfile ? (
+            <Button variant="secondary" size="sm">
+              Edit Profile
+            </Button>
+          ) : (
+            <button
+              onClick={() => toggleFollow(user.id)}
+              className={`px-4 py-1.5 rounded-full text-[13px] font-bold transition-all cursor-pointer ${user.isFollowing
+                  ? "bg-surface border border-line text-ink hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                  : "bg-ink text-white hover:bg-ink/85"
+                }`}
+            >
+              {user.isFollowing ? "Following" : "Follow"}
+            </button>
+          )}
         </div>
 
         {/* İsim ve Handle */}
@@ -156,12 +164,12 @@ export default function ProfilePage({ params }) {
 
       {/* Kullanıcının Gönderi Akışı */}
       <div className="divide-y divide-line">
-        {activeProfileTab === "posts" ? (
-          userPosts.map((post) => <PostCard key={post.id} post={post} />)
-        ) : (
+       {userPosts.length === 0 ? (
           <div className="py-12 text-center text-muted text-[14px]">
-            No content in {activeProfileTab} yet.
+            No {activeProfileTab} yet.
           </div>
+        ) : (
+          userPosts.map((post) => <PostCard key={post.id} post={post} />)
         )}
       </div>
     </div>
