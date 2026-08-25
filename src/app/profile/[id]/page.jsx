@@ -2,15 +2,29 @@
 
 import { use } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin } from "lucide-react";
+import Avatar from "@/components/ui/Avatar";
+import Button from "@/components/ui/Button";
 
 export default function ProfilePage({ params }) {
   const unwrappedParams = use(params);
   const router = useRouter();
+  const user = {
+    id: unwrappedParams.id || "u-arda",
+    name: "Arda Toraman",
+    handle: `@${unwrappedParams.id || "ardatoraman"}`,
+    avatar: "AT",
+    avatarColor: "coral",
+    bio: "Golden Retriever & Samoyed dad 🐕 Full-stack software developer exploring pet tech & local dog parks in Istanbul 🐾",
+    location: "Istanbul, Turkey",
+    joinedDate: "Joined March 2024",
+    followingCount: 142,
+    followersCount: 890,
+  };
 
   return (
     <div>
-      {/* Üst Geri Dön Başlığı */}
+      {/* Geri Dön Başlığı */}
       <header className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-line px-4 py-2.5 z-10 flex items-center gap-6">
         <button
           onClick={() => router.back()}
