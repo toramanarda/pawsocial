@@ -30,6 +30,28 @@ export default function PostDetailPage({ params }) {
       isLiked: false,
     },
   ]);
+  const handleAddComment = (e) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+
+    const newComment = {
+      id: `c-${Date.now()}`,
+      author: {
+        id: currentUser?.id || "u-arda",
+        name: currentUser?.name || "Arda Toraman",
+        handle: currentUser?.handle || "@ardatoraman",
+        avatar: currentUser?.avatar || "AT",
+        avatarColor: currentUser?.avatarColor || "coral",
+      },
+      content: commentText.trim(),
+      createdAt: "Just now",
+      likesCount: 0,
+      isLiked: false,
+    };
+
+    setComments([newComment, ...comments]);
+    setCommentText("");
+  };
 
   if (!post) {
     return <div className="p-8 text-center text-muted text-sm">Post not found.</div>;
@@ -130,7 +152,70 @@ export default function PostDetailPage({ params }) {
           </button>
         </div>
       </div>
+      {/* Yorum Yazma Alanı */}
+      <form
+        onSubmit={handleAddComment}
+        className="p-3 sm:p-4 border-b border-line flex items-start gap-3 bg-surface/30"
+      >
+        <Avatar
+          initials={currentUser?.avatar || "AT"}
+          color={currentUser?.avatarColor || "coral"}
+          size="sm"
+        />
+        <div className="flex-1 flex items-center gap-2 bg-white border border-line rounded-[14px] px-3 py-1.5 focus-within:border-coral transition-colors">
+          <input
+            type="text"
+            placeholder="Post your reply..."
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            className="w-full text-[13px] text-ink outline-none placeholder:text-muted bg-transparent py-1"
+          />
+          <button
+            type="submit"
+            disabled={!commentText.trim()}
+            className="p-1.5 bg-coral text-white rounded-full hover:bg-coral/90 disabled:opacity-30 disabled:hover:bg-coral transition-all cursor-pointer disabled:cursor-not-allowed shrink-0"
+          >
+            <Send size={14} />
+          </button>
+        </div>
+      </form>
 
+      {/* Yorumlar Listesi */}
+      <div className="divide-y divide-line">
+        {comments.map((comment) => (
+          <div
+            key={comment.id}
+            className="p-4 flex items-start gap-3 bg-white hover:bg-surface/30 transition-colors"
+          >
+            <Link href={`/profile/${comment.author.id || comment.author.handle?.replace("@", "")}`}>
+              <Avatar
+                initials={comment.author.avatar}
+                color={comment.author.avatarColor}
+                size="sm"
+              />
+            </Link>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <Link
+                  href={`/profile/${comment.author.id || comment.author.handle?.replace("@", "")}`}
+                  className="font-bold text-[13px] text-ink hover:underline truncate"
+                >
+                  {comment.author.name}
+                </Link>
+                <span className="text-[12px] text-muted truncate">
+                  {comment.author.handle}
+                </span>
+                <span className="text-[11px] text-muted shrink-0">
+                  · {comment.createdAt}
+                </span>
+              </div>
+              <p className="text-[13px] text-ink leading-relaxed mb-2">
+                {comment.content}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 
