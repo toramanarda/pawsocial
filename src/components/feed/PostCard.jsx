@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Avatar from "@/components/ui/Avatar";
+import Image from "next/image";
 import Badge from "@/components/ui/Badge";
 
 export default function PostCard({ post }) {
@@ -43,6 +44,32 @@ export default function PostCard({ post }) {
           <Badge variant="category">{post.category}</Badge>
         )}
       </div>
+      {/* 2. Gönderi Metni ve Etiketler */}
+      <div className="text-[14px] text-ink leading-relaxed whitespace-pre-line mb-3">
+        {post.content}
+        {post.tags && post.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {post.tags.map((tag, idx) => (
+              <span key={idx} className="text-[13px] font-semibold text-coral hover:underline cursor-pointer">
+                {tag.startsWith("#") ? tag : `#${tag}`}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 3. Gönderi Görseli */}
+      {post.image && (
+        <div className="relative w-full h-[280px] sm:h-[320px] rounded-[14px] overflow-hidden mb-3 border border-line/60 bg-surface">
+          <Image
+            src={post.image}
+            alt="Post attachment"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 600px"
+          />
+        </div>
+      )}
     </article>
   );
 }
