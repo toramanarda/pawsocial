@@ -1,0 +1,122 @@
+"use client";
+
+import { createContext, useContext, useState } from "react";
+import { initialPosts, initialUsers, initialTrends } from "@/data/mockData";
+
+const AppContext = createContext();
+
+export function AppProvider({ children }) {
+  const [posts, setPosts] = useState(initialPosts);
+  const [users, setUsers] = useState(initialUsers);
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [feedTab, setFeedTab] = useState("for-you"); 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Post Beğenme
+  const toggleLike = (postId) => {
+    setPosts((prev) =>
+      prev.map((p) => {
+        if (p.id === postId) {
+          const isLiked = p.isLiked;
+          return {
+            ...p,
+            isLiked: !isLiked,
+            likes: isLiked ? p.likes - 1 : p.likes + 1,
+          };
+        }
+        return p;
+      })
+    );
+  };
+
+  // Post Kaydetme 
+  const toggleBookmark = (postId) => {
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId ? { ...p, isBookmarked: !p.isBookmarked } : p
+      )
+    );
+  };
+
+  // Repost 
+  const toggleRepost = (postId) => {
+    setPosts((prev) =>
+      prev.map((p) => {
+        if (p.id === postId) {
+          const isReposted = p.isReposted;
+          return {
+            ...p,
+            isReposted: !isReposted,
+            reposts: isReposted ? p.reposts - 1 : p.reposts + 1,
+          };
+        }
+        return p;
+      })
+    );
+  };
+
+  // Yeni Post Ekleme
+  const addPost = (newPostData) => {
+    const newPost = {
+      id: `p-${Date.now()}`,
+      author: {
+        id: "u-arda",
+        name: "Arda Toraman",
+        handle: "@ardatoraman",
+        avatar: "AT",
+        avatarColor: "coral",
+      },
+      content: newPostData.content,
+      category: newPostData.category || "General",
+      image: newPostData.image || null,
+      location: newPostData.location || null,
+      createdAt: "Just now",
+      likes: 0,
+      comments: 0,
+      reposts: 0,
+      isLiked: false,
+      isBookmarked: false,
+      isReposted: false,
+    };
+    setPosts([newPost, ...posts]);
+  };
+
+  // Kullanıcı Takip Et / Bırak
+  const toggleFollow = (userId) => {
+    setUsers((prev) =>
+      prev.map((u) =>
+        u.id === userId ? { ...u, isFollowing: !u.isFollowing } : u
+      )
+    );
+  };
+
+  return (
+    <AppContext.Provider
+      value={{
+        posts,
+        users,
+        activeCategory,
+        setActiveCategory,
+        feedTab,
+        setFeedTab,
+        searchQuery,
+        setSearchQuery,
+        toggleLike,
+        toggleBookmark,
+        toggleRepost,
+        addPost,
+        toggleFollow,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
+}
+
+export function useApp() {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error("useApp must be used within an AppProvider");
+  }
+  return context;
+}
