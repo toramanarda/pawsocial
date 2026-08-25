@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Search, Bell, User, Bookmark } from "lucide-react";
+import { Home, Search, Bell, User, Bookmark, Mail } from "lucide-react";
+import PostModal from "@/components/feed/PostModal";
 
-export default function Sidebar({ onOpenCreateModal }) {
+export default function Sidebar() {
   const pathname = usePathname();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const navItems = [
     { label: "Home", href: "/", icon: Home },
