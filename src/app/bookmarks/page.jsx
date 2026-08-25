@@ -1,49 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useApp } from "@/context/AppContext";
 import { Bookmark, Trash2 } from "lucide-react";
 import PostCard from "@/components/feed/PostCard";
 
 export default function BookmarksPage() {
-  const [bookmarkedPosts, setBookmarkedPosts] = useState([
-    {
-      id: "b1",
-      authorId: "u-mnuri",
-      author: {
-        name: "Mehmet Nuri",
-        handle: "@mnuri",
-        avatar: "MN",
-        avatarColor: "violet",
-      },
-      content: "Yavru köpeklerde temel itaat eğitimi için ilk 3 ay çok kritik. Sabır ve bolca ödül maması işin sırrı!",
-      category: "Tips & Tricks",
-      tags: ["dogtraining", "puppylife"],
-      createdAt: "4h ago",
-      likesCount: 42,
-      commentsCount: 11,
-      repostsCount: 6,
-    },
-    {
-      id: "b2",
-      authorId: "u-elif",
-      author: {
-        name: "Elif Fidan",
-        handle: "@eliffidan",
-        avatar: "EF",
-        avatarColor: "peach",
-      },
-      content: "Sabah Maçka Parkı yürüyüşünde harika dostlarla karşılaştık! 🐾 Havalar ısınırken sabah serinliğini kaçırmayın.",
-      category: "Walks",
-      tags: ["mackaparki", "morningwalk", "dogs"],
-      createdAt: "2h ago",
-      likesCount: 24,
-      commentsCount: 5,
-      repostsCount: 2,
-    },
-  ]);
+  const { posts, toggleBookmark } = useApp();
+
+  const bookmarkedPosts = posts.filter((p) => p.isBookmarked);
 
   const handleClearAll = () => {
-    setBookmarkedPosts([]);
+    bookmarkedPosts.forEach((post) => toggleBookmark(post.id));
   };
   return (
     <div>
@@ -56,8 +23,12 @@ export default function BookmarksPage() {
           <span className="text-[12px] text-muted">Saved posts & tips</span>
         </div>
         <button
-          className="p-2 rounded-full hover:bg-surface text-muted hover:text-coral transition-colors cursor-pointer"
-          title="Clear all bookmarks"
+          onClick={handleClearAll}
+          disabled={bookmarkedPosts.length === 0}
+          className={`p-2 rounded-full transition-colors ${bookmarkedPosts.length === 0
+              ? "opacity-30 cursor-not-allowed text-muted"
+              : "hover:bg-surface text-muted hover:text-coral cursor-pointer"
+            }`}
         >
           <Trash2 size={16} />
         </button>
