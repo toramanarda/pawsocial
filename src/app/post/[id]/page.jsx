@@ -251,6 +251,45 @@ export default function PostDetailPage({ params }) {
                         <p className="text-[13px] text-ink leading-relaxed mb-2">
                           {comment.content}
                         </p>
+                        {/* Yorum Aksiyon Butonları */}
+                        <div className="flex items-center gap-6 text-muted text-[12px] pt-1">
+                          {/* Reply Butonu */}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setReplyingTo(replyingTo === comment.id ? null : comment.id)
+                            }
+                            className="flex items-center gap-1.5 hover:text-coral transition-colors cursor-pointer"
+                          >
+                            <MessageCircle size={14} />
+                            <span>{replies.length > 0 ? replies.length : 2}</span>
+                          </button>
+
+                          {/* Repost Butonu */}
+                          <button
+                            type="button"
+                            className="flex items-center gap-1.5 hover:text-green-600 transition-colors cursor-pointer"
+                          >
+                            <Repeat2 size={14} />
+                          </button>
+
+                          {/* Like Butonu */}
+                          <button
+                            type="button"
+                            className="flex items-center gap-1.5 hover:text-coral transition-colors cursor-pointer"
+                          >
+                            <Heart size={14} />
+                            <span>{comment.likesCount || 11}</span>
+                          </button>
+
+                          {/* Save Butonu */}
+                          <button
+                            type="button"
+                            className="hover:text-coral transition-colors cursor-pointer"
+                          >
+                            <Bookmark size={14} />
+                          </button>
+                        </div>
                         <button
                           onClick={() =>
                             setReplyingTo(replyingTo === comment.id ? null : comment.id)
