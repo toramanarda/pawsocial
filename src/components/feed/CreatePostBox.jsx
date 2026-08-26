@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Image as ImageIcon, Smile, MapPin } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import { useApp } from "@/context/AppContext";
@@ -21,6 +21,10 @@ export default function CreatePostBox({ onPostCreated }) {
 
     setIsSubmitting(true);
 
+    const typedTags = (content.match(/#[\wığüşöçİĞÜŞÖÇ]+/g) || []).map((t) =>
+      t.replace("#", "")
+    );
+    const finalTags = Array.from(new Set([selectedCategory, ...typedTags]));
     const newPost = {
       id: `p-${Date.now()}`,
       authorId: "u-arda",
@@ -33,10 +37,13 @@ export default function CreatePostBox({ onPostCreated }) {
       content: content.trim(),
       category: selectedCategory,
       createdAt: new Date().toISOString(),
+      category: selectedCategory,
+      tags: finalTags,
       likesCount: 0,
       commentsCount: 0,
       repostsCount: 0,
       commentsList: [],
+
     };
 
     if (addPost) {
@@ -92,20 +99,6 @@ export default function CreatePostBox({ onPostCreated }) {
               title="Add Image"
             >
               <ImageIcon size={18} />
-            </button>
-            <button
-              type="button"
-              className="p-1.5 rounded-full hover:bg-coral/10 transition-colors cursor-pointer"
-              title="Add Emoji"
-            >
-              <Smile size={18} />
-            </button>
-            <button
-              type="button"
-              className="p-1.5 rounded-full hover:bg-coral/10 transition-colors cursor-pointer"
-              title="Add Location"
-            >
-              <MapPin size={18} />
             </button>
           </div>
 
