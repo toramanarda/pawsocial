@@ -18,7 +18,6 @@ export default function PostModal({ isOpen, onClose, onPostCreated }) {
           >
             <X size={18} />
           </button>
-          <span className="text-[13px] font-bold text-muted">Draft</span>
         </div>
         {/* Modal İçi Post */}
         <div className="p-1">
