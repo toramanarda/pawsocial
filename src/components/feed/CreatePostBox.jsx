@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Image as ImageIcon, Smile, MapPin } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
+import { useApp } from "@/context/AppContext";
 
 export default function CreatePostBox({ onPostCreated }) {
+  const { addPost } = useApp();
   const [content, setContent] = useState("");
 
   const [selectedCategory, setSelectedCategory] = useState("General");
@@ -30,12 +32,16 @@ export default function CreatePostBox({ onPostCreated }) {
       },
       content: content.trim(),
       category: selectedCategory,
-      createdAt: "Just now",
+      createdAt: new Date().toISOString(),
       likesCount: 0,
       commentsCount: 0,
       repostsCount: 0,
+      commentsList: [],
     };
 
+    if (addPost) {
+      addPost(newPost);
+    }
     if (onPostCreated) {
       onPostCreated(newPost);
     }
@@ -68,8 +74,8 @@ export default function CreatePostBox({ onPostCreated }) {
               type="button"
               onClick={() => setSelectedCategory(cat)}
               className={`text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap transition-colors cursor-pointer ${selectedCategory === cat
-                  ? "bg-coral text-white"
-                  : "bg-surface text-muted hover:text-ink hover:bg-line/40"
+                ? "bg-coral text-white"
+                : "bg-surface text-muted hover:text-ink hover:bg-line/40"
                 }`}
             >
               {cat}
