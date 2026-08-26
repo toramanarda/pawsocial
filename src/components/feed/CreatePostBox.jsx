@@ -10,10 +10,8 @@ export default function CreatePostBox({ onPostCreated }) {
   const { addPost } = useApp();
   const [content, setContent] = useState("");
 
-  const [selectedCategory, setSelectedCategory] = useState("General");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const categories = ["General", "Parks", "Walks", "Dog Care", "Tips & Tricks", "Adoption"];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -35,9 +33,8 @@ export default function CreatePostBox({ onPostCreated }) {
         avatarColor: "coral",
       },
       content: content.trim(),
-      category: selectedCategory,
+      tags: typedTags,
       createdAt: new Date().toISOString(),
-      category: selectedCategory,
       tags: finalTags,
       likesCount: 0,
       commentsCount: 0,
@@ -54,7 +51,6 @@ export default function CreatePostBox({ onPostCreated }) {
     }
 
     setContent("");
-    setSelectedCategory("General");
     setIsSubmitting(false);
   };
 
@@ -72,23 +68,6 @@ export default function CreatePostBox({ onPostCreated }) {
           rows={3}
           className="w-full bg-transparent border-0 outline-none text-[15px] text-ink placeholder:text-muted resize-none leading-relaxed"
         />
-
-        {/* Kategori */}
-        <div className="flex items-center gap-1.5 overflow-x-auto py-2 border-t border-line/60 no-scrollbar">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setSelectedCategory(cat)}
-              className={`text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap transition-colors cursor-pointer ${selectedCategory === cat
-                ? "bg-coral text-white"
-                : "bg-surface text-muted hover:text-ink hover:bg-line/40"
-                }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
 
         {/* İkonlar ve Post Butonu */}
         <div className="flex items-center justify-between pt-2 border-t border-line/40">
