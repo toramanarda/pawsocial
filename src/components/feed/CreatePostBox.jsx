@@ -49,7 +49,6 @@ export default function CreatePostBox({ onPostCreated }) {
     const typedTags = (content.match(/#[\wığüşöçİĞÜŞÖÇ]+/g) || []).map((t) =>
       t.replace("#", "")
     );
-    const finalTags = Array.from(new Set([selectedCategory, ...typedTags]));
     const newPost = {
       id: `p-${Date.now()}`,
       authorId: "u-arda",
@@ -61,6 +60,7 @@ export default function CreatePostBox({ onPostCreated }) {
       },
       content: content.trim(),
       tags: typedTags,
+      image: mediaPreview,
       media: mediaPreview,
       createdAt: new Date().toISOString(),
       likesCount: 0,

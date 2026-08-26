@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Avatar from "@/components/ui/Avatar";
-import Image from "next/image";
 import { Heart, MessageCircle, Repeat2, Bookmark } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import { useApp } from "@/context/AppContext";
@@ -72,15 +71,12 @@ export default function PostCard({ post }) {
       </div>
 
       {/* 3. Gönderi Görseli */}
-      {
-        post.image && (
+      {(post.image|| post.media)  && (
           <div className="relative w-full h-[280px] sm:h-[320px] rounded-[14px] overflow-hidden mb-3 border border-line/60 bg-surface">
-            <Image
-              src={post.image}
+            <img
+              src={post.image|| post.media}
               alt="Post attachment"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 600px"
+              className="w-full h-full object-cover block"
             />
           </div>
         )
