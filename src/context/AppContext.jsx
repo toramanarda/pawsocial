@@ -86,6 +86,28 @@ export function AppProvider({ children }) {
     );
   };
 
+  const toggleCommentLike = (postId, commentId) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) => {
+        if (post.id === postId) {
+          const updatedComments = (post.commentsList || []).map((comment) => {
+            if (comment.id === commentId) {
+              const isLiked = !comment.isLiked;
+              return {
+                ...comment,
+                isLiked,
+                likesCount: (comment.likesCount || 0) + (isLiked ? 1 : -1),
+              };
+            }
+            return comment;
+          });
+          return { ...post, commentsList: updatedComments };
+        }
+        return post;
+      })
+    );
+  };
+
   // Post Kaydetme 
   const toggleBookmark = (postId) => {
     setPosts((prev) =>
@@ -164,6 +186,7 @@ export function AppProvider({ children }) {
         addPost,
         toggleFollow,
         addComment,
+        toggleCommentLike,
       }}
     >
       {children}
