@@ -9,7 +9,7 @@ import { useApp } from "@/context/AppContext";
 
 export default function RightUtility() {
   const router = useRouter();
-  const { users, toggleFollow } = useApp();
+  const { users, toggleFollow, posts = [] } = useApp();
   const [searchVal, setSearchVal] = useState("");
 
   const handleSearchSubmit = (e) => {
@@ -18,12 +18,41 @@ export default function RightUtility() {
       router.push(`/discovery?q=${encodeURIComponent(searchVal.trim())}`);
     }
   };
-  const trends = [
-    { id: "t1", category: "Trending in Istanbul", tag: "#dogs", postCount: "4,218 posts" },
-    { id: "t2", category: "Outdoor", tag: "#morningwalk", postCount: "1,020 posts" },
-    { id: "t3", category: "Pets", tag: "#adoptdontshop", postCount: "860 posts" },
-    { id: "t4", tag: "#dogfriendly", postCount: "2,032 posts" },
-  ];
+  const tagCounts = {};
+  posts.forEach((p) => {
+    // 1. tags dizisi
+    if (Array.isArray(p.tags)) {
+      p.tags.forEach((tag) => {
+        const clean = tag.replace("#", "").trim();
+        if (clean) tagCounts[clean] = (tagCounts[clean] || 0) + 1;
+      });
+    }
+    // 2. Metin içerisindeki #etiketler
+    if (p.content) {
+      const matches = p.content.match(/#[\wığüşöçİĞÜŞÖÇ]+/g) || [];
+      matches.forEach((t) => {
+        const clean = t.replace("#", "").trim();
+        if (clean && !p.tags?.includes(clean)) {
+          tagCounts[clean] = (tagCounts[clean] || 0) + 1;
+        }
+      });
+    }
+    // 3. Category etiketi
+    if (p.category && !tagCounts[p.category]) {
+      tagCounts[p.category] = (tagCounts[p.category] || 0) + 1;
+    }
+  });
+
+  const trends = Object.entries(tagCounts)
+    .map(([tag, count], idx) => ({
+      id: `trend-${idx}`,
+      category: "Trending in Doggo",
+      tag: `#${tag}`,
+      postCount: `${count} post${count > 1 ? "s" : ""}`,
+      count,
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
   const suggestedUsers = users.filter((u) => u.id !== "u-arda").slice(0, 4);
 
   return (
@@ -45,21 +74,26 @@ export default function RightUtility() {
       <div className="mt-4 p-[14px_16px] rounded-[14px] bg-surface border border-line/60">
         <h3 className="font-extrabold text-[14px] text-ink mb-3">Trends for you</h3>
         <div className="flex flex-col gap-3">
-          {trends.map((t) => (
-            <Link
-              key={t.id}
-              href={`/discovery?q=${encodeURIComponent(t.tag)}`}
-              className="flex flex-col group"
-            >
-              {t.category && (
-                <span className="text-[11px] text-muted font-medium">{t.category}</span>
-              )}
-              <span className="text-[13px] font-bold text-ink group-hover:text-coral transition-colors">
-                {t.tag}
-              </span>
-              <span className="text-[11px] text-muted">{t.postCount}</span>
-            </Link>
-          ))}
+
+          {trends.length === 0 ? (
+            <p className="text-[12px] text-muted">No trending tags yet.</p>
+          ) : (
+            trends.map((t) => (
+              <Link
+                key={t.id}
+                href={`/discovery?q=${encodeURIComponent(t.tag)}`}
+                className="flex flex-col group"
+              >
+                {t.category && (
+                  <span className="text-[11px] text-muted font-medium">{t.category}</span>
+                )}
+                <span className="text-[13px] font-bold text-ink group-hover:text-coral transition-colors">
+                  {t.tag}
+                </span>
+                <span className="text-[11px] text-muted">{t.postCount}</span>
+              </Link>
+            ))
+          )}
         </div>
       </div>
       {/* Who to follow */}
@@ -79,8 +113,8 @@ export default function RightUtility() {
               </Link>
               <button onClick={() => toggleFollow(user.id)}
                 className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all shrink-0 cursor-pointer ${user.isFollowing
-                    ? "bg-surface border border-line text-ink hover:bg-red-50 hover:text-red-600 hover:border-red-200"
-                    : "bg-ink text-white hover:bg-ink/85"
+                  ? "bg-surface border border-line text-ink hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                  : "bg-ink text-white hover:bg-ink/85"
                   }`}
               >
                 {user.isFollowing ? "Following" : "Follow"}
