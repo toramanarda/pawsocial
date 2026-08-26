@@ -127,7 +127,7 @@ export function AppProvider({ children }) {
       category: newPostData.category || "General",
       image: newPostData.image || null,
       location: newPostData.location || null,
-      createdAt: "Just now",
+      createdAt: new Date().toISOString(),
       likes: 0,
       comments: 0,
       reposts: 0,

@@ -8,6 +8,28 @@ import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
 import { useApp } from "@/context/AppContext";
 
+function formatTimeAgo(timestamp) {
+  if (!timestamp) return "Just now";
+  const now = Date.now();
+  const diffInSeconds = Math.floor((now - new Date(timestamp).getTime()) / 1000);
+
+  if (diffInSeconds < 60) return "Just now";
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours}h ago`;
+  const diffInDays = Math.floor(diffInHours / 24);
+  return `${diffInDays}d ago`;
+}
+
+function formatFullDate(dateVal) {
+  const d = dateVal ? new Date(dateVal) : new Date();
+  if (isNaN(d.getTime())) return dateVal || "Just now";
+  const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  const date = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return `${time} · ${date}`;
+}
+
 export default function PostDetailPage({ params }) {
   const unwrappedParams = use(params);
   const router = useRouter();
@@ -99,17 +121,17 @@ export default function PostDetailPage({ params }) {
 
         {/* Tarih Bilgisi */}
         <div className="py-2.5 border-y border-line text-[12px] text-muted">
-          <span>{post.createdAt}</span> · <span>Doggo Web App</span>
+          <span>{formatFullDate(post.createdAt)}</span>
         </div>
 
         {/* Sayaçlar */}
         <div className="py-3 border-b border-line flex items-center gap-6 text-[13px]">
           <div>
-            <span className="font-bold text-ink">{post.repostsCount || 0}</span>{" "}
+            <span className="font-bold text-ink">{post.repostsCount ?? post.reposts ?? 0}</span>{" "}
             <span className="text-muted">Reposts</span>
           </div>
           <div>
-            <span className="font-bold text-ink">{post.likesCount || 0}</span>{" "}
+            <span className="font-bold text-ink">{post.likesCount ?? post.likes ?? 0}</span>{" "}
             <span className="text-muted">Likes</span>
           </div>
           <div>
