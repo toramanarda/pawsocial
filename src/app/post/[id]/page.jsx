@@ -33,12 +33,21 @@ function formatFullDate(dateVal) {
 export default function PostDetailPage({ params }) {
   const unwrappedParams = use(params);
   const router = useRouter();
-  const { posts, currentUser, toggleLike, toggleBookmark, toggleRepost, addComment } = useApp();
+  const { posts, currentUser, toggleLike, toggleBookmark, toggleRepost, addComment, toggleCommentLike } = useApp();
 
   const post = posts.find((p) => p.id === unwrappedParams.id) || posts[0];
   const [commentText, setCommentText] = useState("");
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState("");
+  const [savedCommentIds, setSavedCommentIds] = useState(() => {
+    if (typeof window === "undefined") return new Set();
+    try {
+      const saved = localStorage.getItem("doggo_saved_comments");
+      return saved ? new Set(JSON.parse(saved)) : new Set();
+    } catch {
+      return new Set();
+    }
+  });
 
   if (!post) {
     return <div className="p-8 text-center text-muted text-sm">Post not found.</div>;
@@ -259,15 +268,16 @@ export default function PostDetailPage({ params }) {
                             onClick={() =>
                               setReplyingTo(replyingTo === comment.id ? null : comment.id)
                             }
-                            className="flex items-center gap-1.5 hover:text-coral transition-colors cursor-pointer"
-                          >
+                            className={`flex items-center gap-1.5 hover:text-coral transition-colors cursor-pointer ${replyingTo === comment.id ? "text-coral font-bold" : ""
+                              }`}                          >
                             <MessageCircle size={14} />
-                            <span>{replies.length > 0 ? replies.length : 2}</span>
+                            <span>{replies.length}</span>
                           </button>
 
                           {/* Repost Butonu */}
                           <button
                             type="button"
+                            onClick={() => toggleRepost(post.id)}
                             className="flex items-center gap-1.5 hover:text-green-600 transition-colors cursor-pointer"
                           >
                             <Repeat2 size={14} />
@@ -276,18 +286,35 @@ export default function PostDetailPage({ params }) {
                           {/* Like Butonu */}
                           <button
                             type="button"
-                            className="flex items-center gap-1.5 hover:text-coral transition-colors cursor-pointer"
+                            onClick={() => toggleCommentLike(post.id, comment.id)}
+                            className={`flex items-center gap-1.5 transition-colors cursor-pointer ${comment.isLiked ? "text-coral font-bold" : "hover:text-coral"
+                              }`}
                           >
-                            <Heart size={14} />
-                            <span>{comment.likesCount || 11}</span>
+                            <Heart size={14} className={comment.isLiked ? "fill-coral" : ""} />
+                            <span>{comment.likesCount || 0}</span>
                           </button>
 
                           {/* Save Butonu */}
                           <button
                             type="button"
-                            className="hover:text-coral transition-colors cursor-pointer"
+                            onClick={() => {
+                              setSavedCommentIds((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(comment.id)) {
+                                  next.delete(comment.id);
+                                } else {
+                                  next.add(comment.id);
+                                }
+                                try {
+                                  localStorage.setItem("doggo_saved_comments", JSON.stringify([...next]));
+                                } catch { }
+                                return next;
+                              });
+                            }}
+                            className={`p-1 rounded-full transition-colors cursor-pointer hover:bg-coral/10 ${savedCommentIds.has(comment.id) ? "text-coral" : "text-muted hover:text-coral"
+                              }`}
                           >
-                            <Bookmark size={14} />
+                            <Bookmark size={14} className={savedCommentIds.has(comment.id) ? "fill-coral" : ""} />
                           </button>
                         </div>
                         <button
