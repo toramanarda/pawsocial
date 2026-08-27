@@ -6,6 +6,23 @@ import { Heart, MessageCircle, Repeat2, Bookmark } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import { useApp } from "@/context/AppContext";
 
+function formatRelativeTime(dateString) {
+  if (!dateString) return "· 2h";
+  if (typeof dateString === "string" && (dateString.startsWith("·") || dateString.includes("ago") || dateString.includes("h") || dateString.includes("m") || dateString.includes("d"))) {
+    return dateString.startsWith("·") ? dateString : `· ${dateString}`;
+  }
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now - date) / 1000);
+
+  if (isNaN(diffInSeconds) || diffInSeconds < 0) return `· ${dateString}`;
+  if (diffInSeconds < 60) return "· just now";
+  if (diffInSeconds < 3600) return `· ${Math.floor(diffInSeconds / 60)}m`;
+  if (diffInSeconds < 86400) return `· ${Math.floor(diffInSeconds / 3600)}h`;
+  if (diffInSeconds < 604800) return `· ${Math.floor(diffInSeconds / 86400)}d`;
+  return `· ${Math.floor(diffInSeconds / 604800)}w`;
+}
+
 export default function PostCard({ post }) {
   const { toggleLike, toggleBookmark, toggleRepost } = useApp();
   if (!post) return null;
@@ -39,9 +56,9 @@ export default function PostCard({ post }) {
                 {post.author?.handle || "@doggo"}
               </span>
               <span className="text-muted text-[12px]">•</span>
-              <span className="text-[12px] text-muted shrink-0">
-                {post.createdAt || "Just now"}
-              </span>
+              <time className="text-[12px] text-muted shrink-0">
+                {formatRelativeTime(post.createdAt || post.timestamp)}
+              </time>
             </div>
           </div>
         </div>
@@ -71,15 +88,15 @@ export default function PostCard({ post }) {
       </div>
 
       {/* 3. Gönderi Görseli */}
-      {(post.image|| post.media)  && (
-          <div className="relative w-full h-[280px] sm:h-[320px] rounded-[14px] overflow-hidden mb-3 border border-line/60 bg-surface">
-            <img
-              src={post.image|| post.media}
-              alt="Post attachment"
-              className="w-full h-full object-cover block"
-            />
-          </div>
-        )
+      {(post.image || post.media) && (
+        <div className="relative w-full h-[280px] sm:h-[320px] rounded-[14px] overflow-hidden mb-3 border border-line/60 bg-surface">
+          <img
+            src={post.image || post.media}
+            alt="Post attachment"
+            className="w-full h-full object-cover block"
+          />
+        </div>
+      )
       }
       {/* Etkileşim Butonları */}
       <div className="flex items-center justify-between text-muted text-[13px] pt-1 max-w-[420px]">
