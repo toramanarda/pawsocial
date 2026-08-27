@@ -179,6 +179,35 @@ export function AppProvider({ children }) {
     setPosts((prev) => [newPost, ...prev]);
   };
 
+  // Post Düzenleme
+  const editPost = (postId, newContent) => {
+    setPosts((prev) => {
+      const updated = prev.map((p) =>
+        String(p.id) === String(postId)
+          ? {
+            ...p,
+            content: newContent,
+            isEdited: true,
+          }
+          : p
+      );
+      if (typeof window !== "undefined") {
+        localStorage.setItem("doggo_posts", JSON.stringify(updated));
+      }
+      return updated;
+    });
+  };
+
+  // Post Silme
+  const deletePost = (postId) => {
+    setPosts((prev) => {
+      const updated = prev.filter((p) => String(p.id) !== String(postId));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("doggo_posts", JSON.stringify(updated));
+      }
+      return updated;
+    });
+  };
   const toggleFollow = (userId) => {
     setUsers((prev) =>
       prev.map((u) =>
@@ -241,6 +270,8 @@ export function AppProvider({ children }) {
         toggleBookmark,
         toggleRepost,
         addPost,
+        deletePost,
+        editPost,
         toggleFollow,
         addComment,
         toggleCommentLike,

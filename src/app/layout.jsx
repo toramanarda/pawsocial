@@ -12,7 +12,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
+      <body suppressHydrationWarning>
         <AppProvider>
           <div className="min-h-screen bg-[#eff3f4]">
             <div className="max-w-[1240px] mx-auto min-h-screen flex justify-center bg-white shadow-doggo md:border-x border-line">
