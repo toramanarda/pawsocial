@@ -134,90 +134,103 @@ function DiscoveryContent() {
         </div>
       </header>
       {/* Error State */}
-      {
-        hasError && (
-          <div className="p-8 text-center flex flex-col items-center gap-2">
-            <AlertCircle size={24} className="text-red-500" />
-            <p className="text-[13px] text-muted">Failed to load content.</p>
-            <button onClick={() => setHasError(false)} className="text-[12px] font-bold text-coral flex items-center gap-1 hover:underline">
-              <RefreshCw size={12} /> Retry
-            </button>
+      {hasError && !isLoading && (
+        <div className="py-16 px-4 text-center flex flex-col items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center mb-3">
+            <AlertCircle size={24} />
           </div>
-        )
-      }
+          <h3 className="text-[15px] font-bold text-ink mb-1">Couldn&apos;t load results</h3>
+          <p className="text-[12px] text-muted max-w-xs mb-4">
+            Something went wrong while searching. Please check your connection and try again.
+          </p>
+          <button
+            onClick={() => {
+              setHasError(false);
+              setIsLoading(true);
+              setTimeout(() => setIsLoading(false), 250);
+            }}
+            className="px-4 py-2 bg-surface hover:bg-line text-ink rounded-[10px] text-[12px] font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <RefreshCw size={13} /> Try again
+          </button>
+        </div>
+      )}
 
       {/* Loading State */}
-      {
-        isLoading && (
-          <div className="p-6 flex flex-col gap-3">
-            <div className="h-3 w-1/2 rounded bg-surface animate-pulse" />
-            <div className="h-3 w-full rounded bg-surface animate-pulse" />
-            <div className="h-3 w-5/6 rounded bg-surface animate-pulse" />
-            <div className="h-3 w-1/3 rounded bg-surface animate-pulse mt-2" />
-          </div>
-        )
-      }
+      {isLoading && (
+        <div className="divide-y divide-line">
+          {[1, 2, 3].map((n) => (
+            <div key={n} className="p-4 flex gap-3 animate-pulse">
+              <div className="w-10 h-10 rounded-full bg-surface shrink-0" />
+              <div className="flex-1 flex flex-col gap-2 pt-1">
+                <div className="h-3.5 w-1/3 rounded bg-surface" />
+                <div className="h-3 w-full rounded bg-surface" />
+                <div className="h-3 w-4/5 rounded bg-surface" />
+                <div className="h-24 w-full rounded-[12px] bg-surface mt-1" />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* 1. POSTS SEKMESİ */}
-      {
-        !isLoading && (activeTab === "posts" || activeTab === "all") && (
-          <div>
-            {matchedPosts.length === 0 ? (
-              <div className="py-16 px-4 text-center flex flex-col items-center">
-                <div className="w-10 h-10 rounded-full bg-coral-pale text-coral flex items-center justify-center text-[18px] mb-3">⌕</div>
-                <h3 className="text-[15px] font-bold text-ink mb-1">No posts found</h3>
-                <p className="text-[12px] text-muted max-w-xs mb-4">Try a different topic, person or spelling.</p>
-                <button onClick={() => setSearchTerm("")} className="px-3.5 py-1.5 bg-coral text-white rounded-[8px] text-[12px] font-bold">Clear search</button>
-              </div>
-            ) : (
-              <div className="divide-y divide-line">
-                {matchedPosts.map((post) => (
-                  <PostCard key={post.id} post={post} />
-                ))}
-              </div>
-            )}
-          </div>
-        )
+      {!isLoading && !hasError && (activeTab === "posts" || activeTab === "all") && (
+        <div>
+          {matchedPosts.length === 0 ? (
+            <div className="py-16 px-4 text-center flex flex-col items-center">
+              <div className="w-10 h-10 rounded-full bg-coral-pale text-coral flex items-center justify-center text-[18px] mb-3">⌕</div>
+              <h3 className="text-[15px] font-bold text-ink mb-1">No posts found</h3>
+              <p className="text-[12px] text-muted max-w-xs mb-4">Try a different topic, person or spelling.</p>
+              <button onClick={() => setSearchTerm("")} className="px-3.5 py-1.5 bg-coral text-white rounded-[8px] text-[12px] font-bold">Clear search</button>
+            </div>
+          ) : (
+            <div className="divide-y divide-line">
+              {matchedPosts.map((post) => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </div>
+          )}
+        </div>
+      )
       }
 
       {/* 2. PEOPLE SEKMESİ */}
-      {
-        !isLoading && activeTab === "people" && (
-          <div className="divide-y divide-line">
-            {matchedUsers.length === 0 ? (
-              <div className="py-16 px-4 text-center flex flex-col items-center">
-                <div className="w-10 h-10 rounded-full bg-coral-pale text-coral flex items-center justify-center text-[18px] mb-3">⌕</div>
-                <h3 className="text-[15px] font-bold text-ink mb-1">No people found</h3>
-                <p className="text-[12px] text-muted max-w-xs mb-4">Try searching for another user handle or name.</p>
-                <button onClick={() => setSearchTerm("")} className="px-3.5 py-1.5 bg-coral text-white rounded-[8px] text-[12px] font-bold">Clear search</button>
-              </div>
-            ) : (
-              matchedUsers.map((u) => (
-                <div key={u.id} className="p-4 flex items-start justify-between gap-3 hover:bg-surface/40 transition-colors">
-                  <Link href={`/profile/${u.id}`} className="flex items-start gap-3 min-w-0 flex-1">
-                    <Avatar initials={u.avatar || "DG"} color={u.avatarColor || "peach"} size="md" />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline gap-1.5 flex-wrap">
-                        <span className="font-bold text-[14px] text-ink hover:underline truncate">{u.name}</span>
-                        <span className="text-[12px] text-muted truncate">{u.handle}</span>
-                      </div>
-                      {u.bio && <p className="text-[13px] text-muted mt-0.5 line-clamp-2">{u.bio}</p>}
+      {!isLoading && !hasError && activeTab === "people" && (
+        <div className="divide-y divide-line">
+          {matchedUsers.length === 0 ? (
+            <div className="py-16 px-4 text-center flex flex-col items-center">
+              <div className="w-10 h-10 rounded-full bg-coral-pale text-coral flex items-center justify-center text-[18px] mb-3">⌕</div>
+              <h3 className="text-[15px] font-bold text-ink mb-1">No people found</h3>
+              <p className="text-[12px] text-muted max-w-xs mb-4">Try searching for another user handle or name.</p>
+              <button onClick={() => setSearchTerm("")} className="px-3.5 py-1.5 bg-coral text-white rounded-[8px] text-[12px] font-bold">Clear search</button>
+            </div>
+          ) : (
+            matchedUsers.map((u) => (
+              <div key={u.id} className="p-4 flex items-start justify-between gap-3 hover:bg-surface/40 transition-colors">
+                <Link href={`/profile/${u.id}`} className="flex items-start gap-3 min-w-0 flex-1">
+                  <Avatar initials={u.avatar || "DG"} color={u.avatarColor || "peach"} size="md" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline gap-1.5 flex-wrap">
+                      <span className="font-bold text-[14px] text-ink hover:underline truncate">{u.name}</span>
+                      <span className="text-[12px] text-muted truncate">{u.handle}</span>
                     </div>
-                  </Link>
-                  {toggleFollow && (
-                    <button
-                      onClick={() => toggleFollow(u.id)}
-                      className={`px-3.5 py-1 rounded-[8px] text-[11px] font-extrabold border transition-colors cursor-pointer shrink-0 ${u.isFollowing ? "border-line text-ink bg-white" : "border-coral text-coral bg-white"
-                        }`}
-                    >
-                      {u.isFollowing ? "Following" : "Follow"}
-                    </button>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-        )}
+                    {u.bio && <p className="text-[13px] text-muted mt-0.5 line-clamp-2">{u.bio}</p>}
+                  </div>
+                </Link>
+                {toggleFollow && (
+                  <button
+                    onClick={() => toggleFollow(u.id)}
+                    className={`px-3.5 py-1 rounded-[8px] text-[11px] font-extrabold border transition-colors cursor-pointer shrink-0 ${u.isFollowing ? "border-line text-ink bg-white" : "border-coral text-coral bg-white"
+                      }`}
+                  >
+                    {u.isFollowing ? "Following" : "Follow"}
+                  </button>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 }
