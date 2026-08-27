@@ -16,7 +16,7 @@ function DiscoveryContent() {
   const { posts, users = [], toggleFollow } = useApp();
   const [searchTerm, setSearchTerm] = useState(queryParam);
   const [activeCategory, setActiveCategory] = useState("All");
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState("posts");
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -52,7 +52,7 @@ function DiscoveryContent() {
         p.author?.handle?.toLowerCase().includes(cleanSearch);
       return matchContent || matchTags || matchCategory || matchAuthor;
     })
-    : [];
+    : posts;
 
   const matchedUsers = cleanSearch
     ? users.filter((u) => {
@@ -62,7 +62,7 @@ function DiscoveryContent() {
         u.bio?.toLowerCase().includes(cleanSearch)
       );
     })
-    : [];
+    : users;
 
   return (
     <div>
