@@ -2,7 +2,7 @@
 
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Calendar, MapPin } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, X } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import PostCard from "@/components/feed/PostCard";
@@ -11,7 +11,30 @@ import { useApp } from "@/context/AppContext";
 export default function ProfilePage({ params }) {
   const unwrappedParams = use(params);
   const router = useRouter();
-  const { posts, users, currentUser, toggleFollow } = useApp();
+  const { posts, users, currentUser, toggleFollow, updateCurrentUser } = useApp();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    bio: "",
+    location: "",
+  });
+
+  const handleOpenEditModal = () => {
+    setEditFormData({
+      name: user.name,
+      bio: user.bio,
+      location: user.location,
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleSaveProfile = (e) => {
+    e.preventDefault();
+    if (updateCurrentUser) {
+      updateCurrentUser(editFormData);
+    }
+    setIsEditModalOpen(false);
+  };
 
   const profileId = unwrappedParams.id || "u-arda";
   const isOwnProfile = profileId === (currentUser?.id || "u-arda") || profileId === (currentUser?.handle?.replace("@", "") || "ardatoraman");
@@ -23,13 +46,13 @@ export default function ProfilePage({ params }) {
 
   const user = isOwnProfile
     ? {
-      id: "u-arda",
+      id: currentUser?.id || "u-arda",
       name: currentUser?.name || "Arda Toraman",
       handle: currentUser?.handle || "@ardatoraman",
       avatar: currentUser?.avatar || "AT",
       avatarColor: currentUser?.avatarColor || "coral",
-      bio: "Golden Retriever & Samoyed dad 🐕 Full-stack software developer exploring pet tech & local dog parks in Istanbul 🐾",
-      location: "Istanbul, Turkey",
+      bio: currentUser?.bio ?? "Golden Retriever & Samoyed dad 🐕 ",
+      location: currentUser?.location ?? "Istanbul, Turkey",
       joinedDate: "Joined March 2024",
       followingCount: users.filter((u) => u.isFollowing).length,
       followersCount: 890,
@@ -91,15 +114,20 @@ export default function ProfilePage({ params }) {
             <Avatar initials={user.avatar} color={user.avatarColor} size="lg" />
           </div>
           {isOwnProfile ? (
-            <Button variant="secondary" size="sm">
+            <Button
+              type="button"
+              onClick={handleOpenEditModal}
+              className="px-3.5 py-1.5 rounded-[8px] text-[13px] font-bold border border-coral !text-coral !bg-white hover:!bg-coral hover:!text-white transition-colors cursor-pointer"
+              style={{ color: "var(--color-coral, #ff6a3d)" }}
+            >
               Edit Profile
             </Button>
           ) : (
             <button
               onClick={() => toggleFollow(user.id)}
               className={`px-4 py-1.5 rounded-full text-[13px] font-bold transition-all cursor-pointer ${user.isFollowing
-                  ? "bg-surface border border-line text-ink hover:bg-red-50 hover:text-red-600 hover:border-red-200"
-                  : "bg-ink text-white hover:bg-ink/85"
+                ? "bg-surface border border-line text-ink hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                : "bg-ink text-white hover:bg-ink/85"
                 }`}
             >
               {user.isFollowing ? "Following" : "Follow"}
@@ -109,12 +137,12 @@ export default function ProfilePage({ params }) {
 
         {/* İsim ve Handle */}
         <div className="mb-3">
-          <h2 className="font-extrabold text-[18px] text-ink">{user.name}</h2>
+          <h2 suppressHydrationWarning className="font-extrabold text-[18px] text-ink">{user.name}</h2>
           <span className="text-[13px] text-muted">{user.handle}</span>
         </div>
 
         {/* Biyografi */}
-        <p className="text-[14px] text-ink leading-relaxed mb-3">{user.bio}</p>
+        <p suppressHydrationWarning className="text-[14px] text-ink leading-relaxed mb-3">{user.bio}</p>
 
         {/* Konum & Katılma Tarihi */}
         <div className="flex items-center gap-4 text-[12px] text-muted mb-3 flex-wrap">
@@ -164,7 +192,7 @@ export default function ProfilePage({ params }) {
 
       {/* Kullanıcının Gönderi Akışı */}
       <div className="divide-y divide-line">
-       {userPosts.length === 0 ? (
+        {userPosts.length === 0 ? (
           <div className="py-12 text-center text-muted text-[14px]">
             No {activeProfileTab} yet.
           </div>
@@ -172,6 +200,72 @@ export default function ProfilePage({ params }) {
           userPosts.map((post) => <PostCard key={post.id} post={post} />)
         )}
       </div>
-    </div>
+      {
+        isEditModalOpen && (
+          <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-[16px] w-full max-w-[480px] p-5 shadow-xl border border-line">
+              <div className="flex items-center justify-between pb-3 border-b border-line mb-4">
+                <h3 className="font-extrabold text-[16px] text-ink">Edit Profile</h3>
+                <button
+                  onClick={() => setIsEditModalOpen(false)}
+                  className="p-1 rounded-full text-muted hover:text-ink hover:bg-surface cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSaveProfile} className="flex flex-col gap-4">
+                <div>
+                  <label className="block text-[12px] font-bold text-ink mb-1">Name</label>
+                  <input
+                    type="text"
+                    value={editFormData.name}
+                    onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                    className="w-full px-3 py-2 rounded-[10px] border border-line bg-surface text-[13px] text-ink outline-none focus:border-coral focus:bg-white transition-colors"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[12px] font-bold text-ink mb-1">Bio</label>
+                  <textarea
+                    rows={3}
+                    value={editFormData.bio}
+                    onChange={(e) => setEditFormData({ ...editFormData, bio: e.target.value })}
+                    className="w-full px-3 py-2 rounded-[10px] border border-line bg-surface text-[13px] text-ink outline-none focus:border-coral focus:bg-white transition-colors resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[12px] font-bold text-ink mb-1">Location</label>
+                  <input
+                    type="text"
+                    value={editFormData.location}
+                    onChange={(e) => setEditFormData({ ...editFormData, location: e.target.value })}
+                    className="w-full px-3 py-2 rounded-[10px] border border-line bg-surface text-[13px] text-ink outline-none focus:border-coral focus:bg-white transition-colors"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-line">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditModalOpen(false)}
+                    className="px-4 py-2 rounded-[10px] text-[13px] font-bold text-muted hover:text-ink cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 rounded-[10px] text-[13px] font-bold bg-coral text-white hover:brightness-95 cursor-pointer shadow-sm"
+                  >
+                    Save
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )
+      }
+    </div >
   );
 }

@@ -9,6 +9,18 @@ export function AppProvider({ children }) {
   const [posts, setPosts] = useState(initialPosts);
   const [users, setUsers] = useState(initialUsers);
   const [notifications, setNotifications] = useState(initialNotifications || []);
+  const defaultCurrentUser = {
+    id: "u-arda",
+    name: "Arda Toraman",
+    handle: "@ardatoraman",
+    avatar: "AT",
+    avatarColor: "coral",
+    bio: "Golden Retriever & Samoyed dad 🐕 Full-stack software developer exploring pet tech & local dog parks in Istanbul 🐾",
+    location: "Istanbul, Turkey",
+    joinedDate: "Joined March 2024",
+  };
+
+  const [currentUser, setCurrentUser] = useState(defaultCurrentUser);
   const [activeCategory, setActiveCategory] = useState("all");
   const [feedTab, setFeedTab] = useState("for-you");
   const [searchQuery, setSearchQuery] = useState("");
@@ -19,9 +31,11 @@ export function AppProvider({ children }) {
       const savedPosts = localStorage.getItem("doggo_posts");
       const savedUsers = localStorage.getItem("doggo_users");
       const savedNotifications = localStorage.getItem("doggo_notifications");
+      const savedCurrentUser = localStorage.getItem("doggo_current_user");
       if (savedPosts) setPosts(JSON.parse(savedPosts));
       if (savedUsers) setUsers(JSON.parse(savedUsers));
       if (savedNotifications) setNotifications(JSON.parse(savedNotifications));
+      if (savedCurrentUser) setCurrentUser(JSON.parse(savedCurrentUser));
     } catch (e) {
       console.error("LocalStorage load error:", e);
     } finally {
@@ -35,10 +49,11 @@ export function AppProvider({ children }) {
       localStorage.setItem("doggo_posts", JSON.stringify(posts));
       localStorage.setItem("doggo_users", JSON.stringify(users));
       localStorage.setItem("doggo_notifications", JSON.stringify(notifications));
+      localStorage.setItem("doggo_current_user", JSON.stringify(currentUser));
     } catch (e) {
       console.error("LocalStorage save error:", e);
     }
-  }, [posts, users, isLoaded]);
+  }, [posts, users, isLoaded, notifications, currentUser]);
 
   // Post Beğenme
   const toggleLike = (postId) => {
@@ -195,6 +210,15 @@ export function AppProvider({ children }) {
   };
 
   const unreadNotificationsCount = notifications.filter((n) => !n.isRead && !n.read).length;
+  const updateCurrentUser = (updatedData) => {
+    setCurrentUser((prev) => {
+      const updated = { ...prev, ...updatedData };
+      if (typeof window !== "undefined") {
+        localStorage.setItem("doggo_current_user", JSON.stringify(updated));
+      }
+      return updated;
+    });
+  };
 
   return (
     <AppContext.Provider
@@ -206,6 +230,8 @@ export function AppProvider({ children }) {
         markAllNotificationsAsRead,
         unreadNotificationsCount,
         activeCategory,
+        currentUser,
+        updateCurrentUser,
         setActiveCategory,
         feedTab,
         setFeedTab,
