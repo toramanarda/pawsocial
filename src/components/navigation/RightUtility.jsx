@@ -43,16 +43,17 @@ export default function RightUtility() {
     }
   });
 
+  const sampleLocations = ["Trending in Istanbul", "Outdoor", "Pets", "Breeds", "Care"];
   const trends = Object.entries(tagCounts)
     .map(([tag, count], idx) => ({
       id: `trend-${idx}`,
-      category: "Trending in Doggo",
+      category: sampleLocations[idx % sampleLocations.length],
       tag: `#${tag}`,
-      postCount: `${count} post${count > 1 ? "s" : ""}`,
+      postCount: `${count.toLocaleString()} post${count > 1 ? "s" : ""}`,
       count,
     }))
     .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
+    .slice(0, 4);
   const suggestedUsers = users.filter((u) => u.id !== "u-arda").slice(0, 4);
 
   return (
@@ -71,33 +72,32 @@ export default function RightUtility() {
         </div>
       </form>
       {/* Trending */}
-      <div className="mt-4 p-[14px_16px] rounded-[14px] bg-surface border border-line/60">
-        <h3 className="font-extrabold text-[14px] text-ink mb-3">Trends for you</h3>
-        <div className="flex flex-col gap-3">
-
+      <div className="mt-4 p-[14px_16px] rounded-[14px] bg-white border border-line">
+        <h3 className="font-extrabold text-[14px] text-ink mb-2.5">Trending topics</h3>
+        <div className="divide-y divide-line">
           {trends.length === 0 ? (
-            <p className="text-[12px] text-muted">No trending tags yet.</p>
+            <p className="text-[12px] text-muted py-2">No trending tags yet.</p>
           ) : (
             trends.map((t) => (
-              <Link
-                key={t.id}
-                href={`/discovery?q=${encodeURIComponent(t.tag)}`}
-                className="flex flex-col group"
-              >
-                {t.category && (
-                  <span className="text-[11px] text-muted font-medium">{t.category}</span>
-                )}
-                <span className="text-[13px] font-bold text-ink group-hover:text-coral transition-colors">
-                  {t.tag}
-                </span>
-                <span className="text-[11px] text-muted">{t.postCount}</span>
-              </Link>
+              <div key={t.id} className="py-2 flex items-center justify-between first:pt-0 last:pb-0">
+                <Link
+                  href={`/discovery?q=${encodeURIComponent(t.tag)}`}
+                  className="flex flex-col group min-w-0 flex-1"
+                >
+                  <span className="text-[11px] text-muted">{t.category}</span>
+                  <span className="text-[13px] font-bold text-ink group-hover:text-coral transition-colors truncate">
+                    {t.tag}
+                  </span>
+                  <span className="text-[11px] text-muted">{t.postCount}</span>
+                </Link>
+                <span className="text-muted text-[12px] tracking-[2px] font-bold cursor-pointer select-none pl-2">•••</span>
+              </div>
             ))
           )}
         </div>
       </div>
       {/* Who to follow */}
-      <div className="mt-4 p-[14px_16px] rounded-[14px] bg-surface border border-line/60">
+      <div className="mt-4 p-[14px_16px] rounded-[14px] bg-white border border-line">
         <h3 className="font-extrabold text-[14px] text-ink mb-3">Who to follow</h3>
         <div className="flex flex-col gap-3">
           {suggestedUsers.map((user) => (
@@ -111,10 +111,11 @@ export default function RightUtility() {
                   <span className="text-[11px] text-muted truncate">{user.handle}</span>
                 </div>
               </Link>
-              <button onClick={() => toggleFollow(user.id)}
-                className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all shrink-0 cursor-pointer ${user.isFollowing
-                  ? "bg-surface border border-line text-ink hover:bg-red-50 hover:text-red-600 hover:border-red-200"
-                  : "bg-ink text-white hover:bg-ink/85"
+              <button
+                onClick={() => toggleFollow(user.id)}
+                className={`px-3 py-1 rounded-[8px] text-[11px] font-extrabold border transition-colors shrink-0 cursor-pointer ${user.isFollowing
+                    ? "border-line text-ink bg-white hover:border-red-300 hover:text-red-500"
+                    : "border-coral text-coral bg-white hover:bg-coral hover:text-white"
                   }`}
               >
                 {user.isFollowing ? "Following" : "Follow"}
