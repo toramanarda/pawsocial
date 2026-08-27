@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import Avatar from "@/components/ui/Avatar";
@@ -7,13 +8,39 @@ import { Heart, MessageCircle, UserPlus, Sparkles, CheckCheck } from "lucide-rea
 import { useApp } from "@/context/AppContext";
 
 export default function NotificationsPage() {
-
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("all");
   const {
-    notifications = [],
+    notifications,
     markNotificationAsRead,
     markAllNotificationsAsRead,
   } = useApp();
+
+const handleNotificationClick = (notif) => {
+    if (markNotificationAsRead) {
+      markNotificationAsRead(notif.id);
+    }
+
+    const targetPostId = notif.postId || notif.targetPostId || (notif.type === "like" || notif.type === "mention" ? 1 : null);
+    
+    if (notif.type === "follow") {
+      const targetUserId = notif.user?.id || notif.user?.handle?.replace("@", "") || notif.userId;
+      if (targetUserId) {
+        router.push(`/profile/${targetUserId}`);
+        return;
+      }
+    }
+
+    if (targetPostId) {
+      router.push(`/post/${targetPostId}`);
+      return;
+    }
+
+    const targetUserId = notif.user?.id || notif.user?.handle?.replace("@", "") || notif.userId;
+    if (targetUserId) {
+      router.push(`/profile/${targetUserId}`);
+    }
+  };
 
   const filteredNotifications = notifications.filter((item) => {
     if (activeTab === "mentions") return item.type === "mention";
@@ -82,10 +109,9 @@ export default function NotificationsPage() {
           filteredNotifications.map((notif) => (
             <div
               key={notif.id}
-              onClick={() => markNotificationAsRead(notif.id)}
-              className={`p-[14px_16px] flex items-start gap-3 transition-colors cursor-pointer ${
-                notif.read || notif.isRead ? "bg-white hover:bg-surface/50" : "bg-coral/5 hover:bg-coral/10"
-              }`}
+              onClick={() => handleNotificationClick(notif)}
+              className={`p-[14px_16px] flex items-start gap-3 transition-colors cursor-pointer ${notif.read || notif.isRead ? "bg-white hover:bg-surface/50" : "bg-coral/5 hover:bg-coral/10"
+                }`}
             >
               {/* Tip İkonu */}
               <div className="p-2 rounded-full bg-surface shrink-0 mt-0.5">
