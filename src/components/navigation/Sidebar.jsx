@@ -5,16 +5,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Search, Bell, User, Bookmark, Mail } from "lucide-react";
 import PostModal from "@/components/feed/PostModal";
+import { useApp } from "@/context/AppContext";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { unreadNotificationsCount = 0 } = useApp();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const navItems = [
     { label: "Home", href: "/", icon: Home },
     { label: "Discover", href: "/discovery", icon: Search },
     { label: "Bookmarks", href: "/bookmarks", icon: Bookmark },
-    { label: "Notifications", href: "/notifications", icon: Bell, badge: 2 },
+    { label: "Notifications", href: "/notifications", icon: Bell, badge: unreadNotificationsCount },
     { label: "Profile", href: "/profile/u-arda", icon: User },
   ];
 

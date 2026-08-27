@@ -1,13 +1,14 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { initialPosts, initialUsers, initialTrends } from "@/data/mockData";
+import { initialPosts, initialUsers, initialTrends, initialNotifications } from "@/data/mockData";
 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
   const [posts, setPosts] = useState(initialPosts);
   const [users, setUsers] = useState(initialUsers);
+  const [notifications, setNotifications] = useState(initialNotifications || []);
   const [activeCategory, setActiveCategory] = useState("all");
   const [feedTab, setFeedTab] = useState("for-you");
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,8 +18,10 @@ export function AppProvider({ children }) {
     try {
       const savedPosts = localStorage.getItem("doggo_posts");
       const savedUsers = localStorage.getItem("doggo_users");
+      const savedNotifications = localStorage.getItem("doggo_notifications");
       if (savedPosts) setPosts(JSON.parse(savedPosts));
       if (savedUsers) setUsers(JSON.parse(savedUsers));
+      if (savedNotifications) setNotifications(JSON.parse(savedNotifications));
     } catch (e) {
       console.error("LocalStorage load error:", e);
     } finally {
@@ -31,6 +34,7 @@ export function AppProvider({ children }) {
     try {
       localStorage.setItem("doggo_posts", JSON.stringify(posts));
       localStorage.setItem("doggo_users", JSON.stringify(users));
+      localStorage.setItem("doggo_notifications", JSON.stringify(notifications));
     } catch (e) {
       console.error("LocalStorage save error:", e);
     }
@@ -62,7 +66,7 @@ export function AppProvider({ children }) {
         id: "u-arda",
         name: "Arda Toraman",
         handle: "@ardatoraman",
-        avatar:"AT",
+        avatar: "AT",
         avatarColor: "coral",
       },
       content: commentText.trim(),
@@ -160,7 +164,6 @@ export function AppProvider({ children }) {
     setPosts((prev) => [newPost, ...prev]);
   };
 
-  // Kullanıcı Takip Et / Bırak
   const toggleFollow = (userId) => {
     setUsers((prev) =>
       prev.map((u) =>
@@ -169,11 +172,39 @@ export function AppProvider({ children }) {
     );
   };
 
+  const markNotificationAsRead = (id) => {
+    setNotifications((prev) => {
+      const updated = prev.map((n) =>
+        n.id === id ? { ...n, isRead: true, read: true } : n
+      );
+      if (typeof window !== "undefined") {
+        localStorage.setItem("doggo_notifications", JSON.stringify(updated));
+      }
+      return updated;
+    });
+  };
+
+  const markAllNotificationsAsRead = () => {
+    setNotifications((prev) => {
+      const updated = prev.map((n) => ({ ...n, isRead: true, read: true }));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("doggo_notifications", JSON.stringify(updated));
+      }
+      return updated;
+    });
+  };
+
+  const unreadNotificationsCount = notifications.filter((n) => !n.isRead && !n.read).length;
+
   return (
     <AppContext.Provider
       value={{
         posts,
         users,
+        notifications,
+        markNotificationAsRead,
+        markAllNotificationsAsRead,
+        unreadNotificationsCount,
         activeCategory,
         setActiveCategory,
         feedTab,

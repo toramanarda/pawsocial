@@ -4,79 +4,18 @@ import { useState } from "react";
 import Link from "next/link";
 import Avatar from "@/components/ui/Avatar";
 import { Heart, MessageCircle, UserPlus, Sparkles, CheckCheck } from "lucide-react";
+import { useApp } from "@/context/AppContext";
 
 export default function NotificationsPage() {
 
   const [activeTab, setActiveTab] = useState("all");
-  const [notificationsList, setNotificationsList] = useState([
-    {
-      id: "n1",
-      type: "like",
-      user: {
-        id: "u-elif",
-        name: "Elif Fidan",
-        handle: "@eliffidan",
-        avatar: "EF",
-        avatarColor: "peach",
-      },
-      text: "liked your post about Maçka Park.",
-      time: "10m ago",
-      read: false,
-    },
-    {
-      id: "n2",
-      type: "follow",
-      user: {
-        id: "u-mnuri",
-        name: "Mehmet Nuri",
-        handle: "@mnuri",
-        avatar: "MN",
-        avatarColor: "violet",
-      },
-      text: "started following you.",
-      time: "1h ago",
-      read: false,
-    },
-    {
-      id: "n3",
-      type: "mention",
-      user: {
-        id: "u-ayse",
-        name: "Ayşe Kaya",
-        handle: "@aysekaya",
-        avatar: "AK",
-        avatarColor: "violet",
-      },
-      text: "mentioned you in a comment: '@ardatoraman hafta sonu parkta buluşuyor muyuz?'",
-      time: "3h ago",
-      read: true,
-    },
-    {
-      id: "n4",
-      type: "like",
-      user: {
-        id: "u-caner",
-        name: "Caner Yılmaz",
-        handle: "@canery",
-        avatar: "CY",
-        avatarColor: "blue",
-      },
-      text: "liked your training tips post.",
-      time: "5h ago",
-      read: true,
-    },
-  ]);
-  const markAllAsRead = () => {
-    setNotificationsList((prev) => prev.map((n) => ({ ...n, read: true })));
-  };
+  const {
+    notifications = [],
+    markNotificationAsRead,
+    markAllNotificationsAsRead,
+  } = useApp();
 
-  const markAsRead = (id) => {
-    setNotificationsList((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    );
-  };
-
-  const filteredNotifications = notificationsList.filter((item) => {
+  const filteredNotifications = notifications.filter((item) => {
     if (activeTab === "mentions") return item.type === "mention";
     if (activeTab === "likes") return item.type === "like";
     return true;
@@ -108,7 +47,7 @@ export default function NotificationsPage() {
         <div className="p-3 flex items-center justify-between">
           <h1 className="font-extrabold text-[16px] text-ink">Notifications</h1>
           <button
-            onClick={markAllAsRead}
+            onClick={markAllNotificationsAsRead}
             className="flex items-center gap-1 text-[12px] font-semibold text-muted hover:text-coral transition-colors cursor-pointer"
             title="Mark all as read"
           >
@@ -143,9 +82,10 @@ export default function NotificationsPage() {
           filteredNotifications.map((notif) => (
             <div
               key={notif.id}
-              onClick={() => markAsRead(notif.id)}
-              className={`p-[14px_16px] flex items-start gap-3 transition-colors cursor-pointer ${notif.read ? "bg-white hover:bg-surface/50" : "bg-coral/5 hover:bg-coral/10"
-                }`}
+              onClick={() => markNotificationAsRead(notif.id)}
+              className={`p-[14px_16px] flex items-start gap-3 transition-colors cursor-pointer ${
+                notif.read || notif.isRead ? "bg-white hover:bg-surface/50" : "bg-coral/5 hover:bg-coral/10"
+              }`}
             >
               {/* Tip İkonu */}
               <div className="p-2 rounded-full bg-surface shrink-0 mt-0.5">
@@ -172,7 +112,7 @@ export default function NotificationsPage() {
                   <span className="text-[11px] text-muted shrink-0">
                     {notif.time}
                   </span>
-                  {!notif.read && (
+                  {!(notif.read || notif.isRead) && (
                     <span className="w-2 h-2 rounded-full bg-coral shrink-0 ml-auto" />
                   )}
                 </div>
