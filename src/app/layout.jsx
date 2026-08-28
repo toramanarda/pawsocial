@@ -3,6 +3,7 @@ import Sidebar from "@/components/navigation/Sidebar";
 import RightUtility from "@/components/navigation/RightUtility";
 import MobileNav from "@/components/navigation/MobileNav";
 import { AppProvider } from "@/context/AppContext";
+import MobileHeader from "@/components/navigation/MobileHeader";
 
 export const metadata = {
   title: "Doggo Social",
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
 
               {/* Orta Feed Alanı */}
               <div className="flex-1 flex flex-col min-w-0 max-w-[620px] border-r border-line pb-16 md:pb-0">
+                <MobileHeader />
                 <main className="flex-1 min-h-screen bg-white">
                   {children}
                 </main>

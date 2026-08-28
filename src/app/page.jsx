@@ -31,32 +31,8 @@ export default function HomePage() {
     <div>
       {/* Üst Başlık */}
       <header className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-line z-10">
-        <div className="flex items-center justify-between px-4 py-3.5 border-b border-line">
-          {/* Mobil Hamburger Menü */}
-          <button
-            type="button"
-            onClick={() => setIsMenuOpen(true)}
-            className="md:hidden p-1.5 -ml-1.5 rounded-full text-ink hover:bg-surface transition-colors cursor-pointer"
-            aria-label="Open menu"
-          >
-            <Menu size={22} />
-          </button>
-
-          <Link href="/" className="flex items-center justify-center">
-            <div className="w-8 h-8 rounded-xl bg-coral flex items-center justify-center text-white font-black text-[18px] shadow-sm tracking-tight select-none">
-              D
-            </div>
-          </Link>
-          <button
-            type="button"
-            onClick={() => setIsCreateOpen(true)}
-            className="md:hidden p-1.5 -mr-1.5 rounded-full text-coral hover:bg-coral-pale/40 transition-colors cursor-pointer"
-            aria-label="Create post"
-          >
-            <Plus size={22} className="stroke-[2.5]" />
-          </button>
-
-          <div className="hidden md:block w-5" />
+        <div className="hidden md:flex items-center justify-between px-4 py-3.5 border-b border-line">
+          <h1 className="text-[18px] font-extrabold text-ink">Home</h1>
         </div>
         <div className="flex border-b border-line">
           <button
