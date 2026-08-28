@@ -68,6 +68,9 @@ function DiscoveryContent() {
     <div>
       {/* Arama Başlığı */}
       <header className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-line p-3 z-10">
+        <header className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-line z-10 px-4 py-3.5 hidden md:flex items-center justify-between">
+          <h1 className="text-[18px] font-extrabold text-ink">Discover</h1>
+        </header>
         <div className="flex items-center gap-2 px-3 py-2 rounded-[12px] bg-surface text-[13px] border border-transparent focus-within:border-coral focus-within:bg-white transition-colors">
           <Search size={16} className="text-muted shrink-0" />
           <input
