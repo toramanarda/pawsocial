@@ -2,6 +2,8 @@
 
 **Doggo Social, evcil hayvan sahipleri ve hayvanseverlerin deneyimlerini, anlarını ve ipuçlarını paylaştığı; modern, duyarlı (responsive) ve topluluk odaklı bir mikroblog platformudur.**
 
+**Canlı Demo (Live Deployment):** https://doggo-social.vercel.app/
+
  # 1. Projenin Çalıştırılması
 
 ```bash
