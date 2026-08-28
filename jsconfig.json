@@ -1,9 +1,14 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*"]
+  "include": [
+    "src/**/*",
+    "__tests__/**/*",
+    "jest.setup.js",
+    "jest.config.js"
+  ],
+  "exclude": ["node_modules", ".next"]
 }
