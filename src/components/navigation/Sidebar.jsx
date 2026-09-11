@@ -23,12 +23,12 @@ export default function Sidebar() {
   return (
     <>
       <aside className="hidden md:flex flex-col w-[205px] border-r border-line p-[18px_13px] shrink-0 bg-white sticky top-0 h-screen">
-        {/* Doggo Logosu */}
+        {/* PawSocial Logosu */}
         <Link href="/" className="flex items-center gap-2 mx-[6px] mb-[22px] font-extrabold text-[17px] tracking-[-0.04em]">
           <span className="grid place-items-center w-7 h-7 rounded-[9px] bg-coral text-white font-black text-sm">
             D
           </span>
-          Doggo
+          PawSocial
         </Link>
 
         {/* Navigasyon Bağlantıları */}

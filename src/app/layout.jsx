@@ -6,8 +6,8 @@ import { AppProvider } from "@/context/AppContext";
 import MobileHeader from "@/components/navigation/MobileHeader";
 
 export const metadata = {
-  title: "Doggo Social",
-  description: "A thoughtful social space for dogs and their humans",
+  title: "PawSocial - Evcil Hayvan Severler Topluluğu",
+  description: "Evcil hayvan sahipleri ve hayvanseverler için modern mikroblog platformu.",
 };
 
 export default function RootLayout({ children }) {

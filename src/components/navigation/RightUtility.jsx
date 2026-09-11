@@ -64,7 +64,7 @@ export default function RightUtility() {
           <Search size={14} className="text-muted shrink-0" />
           <input
             type="text"
-            placeholder="Search Doggo"
+            placeholder="Search PawSocial"
             value={searchVal}
             onChange={(e) => setSearchVal(e.target.value)}
             className="bg-transparent border-0 outline-none w-full text-ink placeholder:text-muted"
